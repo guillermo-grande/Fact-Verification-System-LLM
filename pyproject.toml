@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "fact-verification-system-llm"
+version = "0.1.0"
+description = "Fact Checking System with RAG functionalities"
+authors = [
+    "Guillermo Grande Santi <>",
+    "Rubén Cid Costa <rubencid001@gmail.com>",
+    "Jaime Ruiz Salcedo <>",
+    "Jesús Martín Trilla <>"
+    ]
+license = "MIT License"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+ollama = "^0.4.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
