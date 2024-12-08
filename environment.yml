@@ -10,4 +10,4 @@ dependencies:
   - datasets
   - chromadb
   - transformers
-prefix: C:\Users\ruben\miniconda3\envs\rag-311
+  - conda
