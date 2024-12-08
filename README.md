@@ -19,4 +19,4 @@ The implemented system in this repository was developed by:
 - **Guillermo Grande Santi**
 - **Rubén Cid Costa**
 - **Jaime Ruiz Salcedo**
-- **Jesús Martín Trilla**
+- **Jesús Martín Trilla** 

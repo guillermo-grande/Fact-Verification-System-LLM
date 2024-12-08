@@ -6,4 +6,8 @@ channels:
 dependencies:
   - python=3.11
   - llama-index
+  - dataset
+  - datasets
+  - chromadb
+  - transformers
 prefix: C:\Users\ruben\miniconda3\envs\rag-311
