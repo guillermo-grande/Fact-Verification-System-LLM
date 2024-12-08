@@ -14,7 +14,6 @@ To simplify setting up the project in the VM,  we could use `conda` (for quick e
 conda env create -f environment.yml
 ```
 
-
 ## Contributors
 The implemented system in this repository was developed by:
 - **Guillermo Grande Santi**
