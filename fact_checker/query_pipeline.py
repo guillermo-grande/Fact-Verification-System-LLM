@@ -6,6 +6,7 @@ import logging
 import requests
 
 from llm_model import llm, LLAMA_AVAILABLE
+from decomposer import decompose_query
 from data_loaders import retrieve_engine
 from utils import load_prompt
 
@@ -20,7 +21,7 @@ logger.addHandler(stream)
 # URL del endpoint para el modelo Llama 3.2
 LLAMA_API_URL = "http://kumo01:11434/api/generate"
 
-def query(prompt: str, temperature: float = 0.2, max_tokens: int = 256):
+def query_llama(prompt: str, temperature: float = 0.2, max_tokens: int = 256):
     """
     Consulta el modelo a través de una API remota.
 
@@ -81,13 +82,43 @@ def query_retriever(query: str, retriever):
         logger.critical(f"Error durante la consulta: {e}")
         raise
 
+def verification_pipeline(query: str) -> str:
+    """
+    Runs the full pipeline
+
+    Args:
+    - query (str). User query with the original claims
+    
+    Returns:
+    - str. Text with full response.
+    """
+    # decompose into multiple atomic claims
+    atomic_claims = decompose_query(query)
+    # atomic_claims = [
+    #     "The ozone layer is open over the Red Sea.",
+    #     "The sea level of the Red Sea is rising.",
+    #     "The rising sea level of the Red Sea is due to climate change."
+    # ]
+
+    # get claims
+    for a, atomic in enumerate(atomic_claims):
+
+        documents = retrieve_engine.retrieve(atomic)
+
+        print(f"[ {a:2d} ] claim: {atomic}")
+        print(f"[ {a:2d} ] nº retrieved documents:", len(documents))
+        for i, doc in enumerate(documents, start = 1):
+            print(f"[ {a:2d}-{i:03d} ]{repr(doc.text[:50])}")
+        print("")
+    
+    return ""
+
 if __name__ == "__main__":
     # Pregunta del usuario
-    query = "¿Cuál es el impacto del cambio climático según el conjunto de datos?"
+    query = "La capa de ozono está abierta sobre el mar rojo, cuyo nivel está subiendo debido a el cambio climático"
 
     # Consultar y generar respuesta
     try:
-        response = query_retriever(query=query, retriever=retrieve_engine)
-        print(f"Respuesta: {response}")
+        verification_pipeline(query)
     except Exception as e:
         logger.error(f"Error al ejecutar la consulta: {e}")

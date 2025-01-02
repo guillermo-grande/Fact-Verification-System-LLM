@@ -18,6 +18,11 @@ from chromadb.utils import embedding_functions
 from chromadb.config import Settings as ChromaDBSettings
 from llama_index.vector_stores.chroma import ChromaVectorStore
 
+# display options
+pd.set_option("display.max_colwidth", 50)
+pd.set_option("display.max_rows", 10)
+pd.set_option("display.max_columns", 10)
+
 # logging settings
 logger = logging.getLogger("data-loader")
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s", datefmt = "%Y-%m-%d %H:%M:%S")
@@ -41,20 +46,18 @@ def download_climate_fever(streaming: bool = False):
         logger.critical("failed to load climate-fever dataset")
         sys.exit(1)
 
-def climate_evidence_documents():
-
 def process_climate_fever(save=True):
     ds = download_climate_fever() 
     df = ds["test"].to_pandas()
     
-    def accumulate_evidence(evidence_list):
+    def accumilate_evidence(evidence_list):
         sep = "\n*"
         complete_evidence = sep
         for evidence in evidence_list:
             complete_evidence = complete_evidence + sep + evidence["evidence"]
         return complete_evidence
         
-    df["evidence"] = df["evidences"].apply(accumulate_evidence)
+    df["evidence"] = df["evidences"].apply(accumilate_evidence)
     df["text"]     = "Evidence: " + df["evidence"] + "\nClaim: " + df["claim"]
     df["label"]    = df["claim_label"]
     df["unanswerable"] = df["label"] == 2 # wheter it is not supported 
@@ -135,11 +138,5 @@ if index is None:
         embed_model=embed_model,
     )
 
-retrieve_engine = index.as_retriever(embed_model=embed_model, similarity_top_k=5)
-
-if __name__ == '__main__':
-    # from llm_model import llm
-    #query_engine = index.as_query_engine(embed_model=embed_model, llm_moled = llm)
-    response = retrieve_engine.retrieve("There is an ecological collapse")
-    print("nº of reponse:", type(response[0]))
-    for res in response: print(res, end = "\n\n")
+retrieve_engine = index.as_retriever(embed_model=embed_model, n_results=5)
+print(type(retrieve_engine))

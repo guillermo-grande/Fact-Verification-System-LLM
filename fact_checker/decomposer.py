@@ -1,5 +1,4 @@
 
-import re
 from llm_model import llm, LLAMA_AVAILABLE
 from utils import load_prompt
 
@@ -9,7 +8,6 @@ DECOMPOSE_PROMPT = load_prompt("decompose", PROMPT_VERSION)
 if LLAMA_AVAILABLE: 
     raise NotImplementedError("Llama Model is not supported yet")
 
-response_pattern = re.compile("\* ([\w\s\d]*)")
 def decompose_query(query: str) -> list[str]:
     """
     Decompose a given query into a series of multiple atomic claims.
