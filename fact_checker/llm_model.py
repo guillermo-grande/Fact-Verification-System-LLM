@@ -10,12 +10,7 @@ import logging
 from llama_index.llms.openai import OpenAI
 
 # Configuración de logging
-logger = logging.getLogger("llm-selector")
-formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-stream = logging.StreamHandler()
-stream.setFormatter(formatter)
-logger.setLevel(logging.INFO)
-logger.addHandler(stream)
+logger = logging.getLogger("fact-checker.llm-selector")
 
 # URL del endpoint para el modelo Llama 3.2
 LLAMA_API_URL = "http://kumo01:11434/api/generate"

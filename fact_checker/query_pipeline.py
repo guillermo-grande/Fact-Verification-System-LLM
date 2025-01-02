@@ -5,18 +5,20 @@ import os
 import logging
 import requests
 
-from llm_model import llm, LLAMA_AVAILABLE
-from decomposer import decompose_query
-from data_loaders import retrieve_engine
-from utils import load_prompt
-
 # Configuración de logging
-logger = logging.getLogger("query-pipeline")
+logger = logging.getLogger("fact-checker") # .query-pipeline
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 stream = logging.StreamHandler()
 stream.setFormatter(formatter)
 logger.setLevel(logging.INFO)
 logger.addHandler(stream)
+
+from llm_model import llm, LLAMA_AVAILABLE
+from decomposer import decompose_query
+from data_loaders import retrieve_engine
+from utils import load_prompt
+
+
 
 # URL del endpoint para el modelo Llama 3.2
 LLAMA_API_URL = "http://kumo01:11434/api/generate"

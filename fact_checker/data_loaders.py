@@ -19,12 +19,7 @@ from chromadb.config import Settings as ChromaDBSettings
 from llama_index.vector_stores.chroma import ChromaVectorStore
 
 # logging settings
-logger = logging.getLogger("data-loader")
-formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s", datefmt = "%Y-%m-%d %H:%M:%S")
-stream = logging.StreamHandler()
-stream.setFormatter(formatter)
-logger.setLevel(logging.DEBUG)
-logger.addHandler(stream)
+logger = logging.getLogger("fact-checker.data-loader")
 
 DOWNLOAD_LOCATION: str = "data"
 if not os.path.exists(DOWNLOAD_LOCATION): os.mkdir(DOWNLOAD_LOCATION)
@@ -40,8 +35,6 @@ def download_climate_fever(streaming: bool = False):
     except:
         logger.critical("failed to load climate-fever dataset")
         sys.exit(1)
-
-def climate_evidence_documents():
 
 def process_climate_fever(save=True):
     ds = download_climate_fever() 
