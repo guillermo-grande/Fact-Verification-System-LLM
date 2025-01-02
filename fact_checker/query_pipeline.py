@@ -1,6 +1,13 @@
+from dotenv import load_dotenv
+load_dotenv()
+
+import os
 import logging
 import requests
+
+from llm_model import llm, LLAMA_AVAILABLE
 from data_loaders import retrieve_engine
+from utils import load_prompt
 
 # Configuración de logging
 logger = logging.getLogger("query-pipeline")
@@ -13,9 +20,9 @@ logger.addHandler(stream)
 # URL del endpoint para el modelo Llama 3.2
 LLAMA_API_URL = "http://kumo01:11434/api/generate"
 
-def query_llama3_2(prompt: str, temperature: float = 0.7, max_tokens: int = 256):
+def query(prompt: str, temperature: float = 0.2, max_tokens: int = 256):
     """
-    Consulta el modelo Llama 3.2 a través de una API remota.
+    Consulta el modelo a través de una API remota.
 
     Args:
         prompt (str): Texto de entrada para el modelo.
@@ -26,7 +33,7 @@ def query_llama3_2(prompt: str, temperature: float = 0.7, max_tokens: int = 256)
         str: Respuesta generada por el modelo.
     """
     try:
-        logger.info("Consultando el modelo Llama 3.2.")
+        logger.info("Consultando el modelo")
         headers = {
             "Content-Type": "application/json"
         }
@@ -67,8 +74,8 @@ def query_retriever(query: str, retriever):
         context = "\n\n".join([doc.text for doc in retrieved_documents])
         prompt = f"Contexto: {context}\n\nPregunta: {query}\n\nRespuesta:"
 
-        # Consultar Llama 3.2 con el contexto
-        response = query_llama3_2(prompt)
+        # Consultar
+        response = query(prompt)
         return response
     except Exception as e:
         logger.critical(f"Error durante la consulta: {e}")

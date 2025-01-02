@@ -13,6 +13,7 @@ from llama_index.core import StorageContext
 from llama_index.core import Settings
 
 import chromadb
+from chromadb import PersistentClient
 from chromadb.utils import embedding_functions
 from chromadb.config import Settings as ChromaDBSettings
 from llama_index.vector_stores.chroma import ChromaVectorStore
@@ -27,7 +28,7 @@ logger = logging.getLogger("data-loader")
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s", datefmt = "%Y-%m-%d %H:%M:%S")
 stream = logging.StreamHandler()
 stream.setFormatter(formatter)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 logger.addHandler(stream)
 
 DOWNLOAD_LOCATION: str = "data"
@@ -79,11 +80,11 @@ embed_model = HuggingFaceEmbedding(model_name=embed_model_id)
 # Configuración de ChromaDB
 if not os.path.exists(DOWNLOAD_LOCATION + "/chromadb"): 
     os.mkdir(DOWNLOAD_LOCATION + "/chromadb")
-chroma_client = chromadb.Client(
-    ChromaDBSettings(persist_directory=DOWNLOAD_LOCATION+"/chromadb")
-)
 
+chroma_client = chromadb.PersistentClient(path=DOWNLOAD_LOCATION+"/chromadb")
 collection = chroma_client.get_or_create_collection("index_climate_fever")
+
+logger.debug("sucessfully created chromaDB instance")
 
 # settings = Settings(embed_model=embed_model)
 vector_store = ChromaVectorStore(chroma_collection=collection)
@@ -120,10 +121,9 @@ try:
         storage_context=storage_context,
         embed_model=embed_model
     )
-    logger.info(f"Dataset is loaded and ready in the chromadb instance.")
+    logger.info(f"dataset is loaded and ready in the chromadb instance.")
 except Exception as error:
     logger.critical(f"failed to load data to chromaDB. error: {error}")
     sys.exit(1)
 
 retrieve_engine = index.as_retriever(embed_model=embed_model)
-
