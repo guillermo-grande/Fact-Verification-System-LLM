@@ -1,23 +1,24 @@
-from dotenv import load_dotenv
-load_dotenv()
+from collections import defaultdict
+from dotenv import load_dotenv; load_dotenv() # load API KEYs
 
 import os
-import logging
 import requests
 
 # Configuración de logging
-logger = logging.getLogger("fact-checker") # .query-pipeline
-formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-stream = logging.StreamHandler()
-stream.setFormatter(formatter)
-logger.setLevel(logging.INFO)
-logger.addHandler(stream)
+import logging
+from   utils import configure_logger
+logger = logging.getLogger("fact-checker")
+logger = configure_logger(logger, 'INFO')
 
-from llm_model import llm, LLAMA_AVAILABLE
-from decomposer import decompose_query
-from data_loaders import retrieve_engine
-from utils import load_prompt
+from llm_model    import llm, LLAMA_AVAILABLE
+from decomposer   import decompose_query
+from utils        import load_prompt
+from hier_loaders import EvidenceClaimRetriever
 
+#--------------------------------------------------------------------
+# Data Retriever
+#--------------------------------------------------------------------
+retrieve_engine = EvidenceClaimRetriever(3, 25)
 
 
 # URL del endpoint para el modelo Llama 3.2
@@ -57,33 +58,6 @@ def query_llama(prompt: str, temperature: float = 0.2, max_tokens: int = 256):
         logger.critical(f"Error al consultar el modelo Llama 3.2: {e}")
         raise
 
-def query_retriever(query: str, retriever):
-    """
-    Ejecuta una consulta al retriever y genera una respuesta con Llama 3.2.
-
-    Args:
-        query (str): Pregunta del usuario.
-        retriever: Motor de recuperación.
-
-    Returns:
-        str: Respuesta generada.
-    """
-    try:
-        logger.info("Ejecutando consulta al retriever.")
-        retrieved_documents = retriever.retrieve(query)
-        logger.info(f"Documentos recuperados: {len(retrieved_documents)}")
-
-        # Construir contexto para el modelo (Cambiar para seguir metodología del paper)
-        context = "\n\n".join([doc.text for doc in retrieved_documents])
-        prompt = f"Contexto: {context}\n\nPregunta: {query}\n\nRespuesta:"
-
-        # Consultar
-        response = query(prompt)
-        return response
-    except Exception as e:
-        logger.critical(f"Error durante la consulta: {e}")
-        raise
-
 def verification_pipeline(query: str) -> str:
     """
     Runs the full pipeline
@@ -95,32 +69,51 @@ def verification_pipeline(query: str) -> str:
     - str. Text with full response.
     """
     # decompose into multiple atomic claims
-    atomic_claims = decompose_query(query)
-    # atomic_claims = [
-    #     "The ozone layer is open over the Red Sea.",
-    #     "The sea level of the Red Sea is rising.",
-    #     "The rising sea level of the Red Sea is due to climate change."
-    # ]
+    # atomic_claims = decompose_query(query)
+    atomic_claims = [
+        "The ozone layer is open over the Red Sea.", 
+        "The sea level of the Red Sea is rising.",
+        "The rising sea level of the Red Sea is due to climate change."
+    ]
+
+    # claim grande -> atomic -> [yes | no] -> yes -> no (no se puede, pq esta claim esta dentro es falsa)
+
+    map_evidence_label = {
+        '0': 'supports',
+        '1': 'refutes',
+        '2': 'not_enough_information'
+    }
 
     # get claims
-    for a, atomic in enumerate(atomic_claims):
+    all_evidences = []
+    for claim_id, atomic in enumerate(atomic_claims):
 
-        documents = retrieve_engine.retrieve(atomic)
+        support   = defaultdict(lambda : 0)
+        evidences = retrieve_engine.retrieve(atomic)
+        
+        print("claim:", atomic)
+        for e in evidences:
+            label = map_evidence_label[str(e.metadata.get("evidence_label"))]
+            support[label] += e.metadata.get('entropy') 
+            print(f"Evidencia: 1\nText:{e.text}\nevidence_label: {label}\nentropy: {e.metadata.get('entropy')}")
+            print()
+        
+        print("soporte: ", dict(support))
+        print()
+        all_evidences.extend(evidences)
 
-        print(f"[ {a:2d} ] claim: {atomic}")
-        print(f"[ {a:2d} ] nº retrieved documents:", len(documents))
-        for i, doc in enumerate(documents, start = 1):
-            print(f"[ {a:2d}-{i:03d} ]{repr(doc.text[:50])}")
-        print("")
+    """
     
-    return ""
+    """
+
+    return all_evidences
 
 if __name__ == "__main__":
     # Pregunta del usuario
     query = "La capa de ozono está abierta sobre el mar rojo, cuyo nivel está subiendo debido a el cambio climático"
-
+    
     # Consultar y generar respuesta
-    try:
-        verification_pipeline(query)
-    except Exception as e:
-        logger.error(f"Error al ejecutar la consulta: {e}")
+    # try:
+    documents = verification_pipeline(query)
+    # except Exception as e:
+    #     logger.error(f"Error al ejecutar la consulta: {e}")
