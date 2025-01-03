@@ -8,6 +8,7 @@ from ping3 import ping
 import logging
 
 from llama_index.llms.openai import OpenAI
+from llama_index.llms.ollama import Ollama
 
 # Configuración de logging
 logger = logging.getLogger("fact-checker.llm-selector")
@@ -34,6 +35,6 @@ if not LLAMA_AVAILABLE:
         logger.critical("La API key de OpenAI no se encontró en el archivo .env.")
         raise ValueError("Falta la API key de OpenAI en el archivo .env.")
 
-    llm = OpenAI(model = "gpt-4o-mini")
+    llm = OpenAI(model = "gpt-4o-mini", temperature=0.1, max_tokens=200)
 else:
-    llm = None
+    llm = Ollama("llama2:latest", "http://kumo01:11434", temperature=0.1, request_timeout=120.0)
