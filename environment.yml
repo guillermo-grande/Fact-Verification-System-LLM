@@ -11,3 +11,4 @@ dependencies:
   - chromadb
   - transformers
   - conda
+  - flask
