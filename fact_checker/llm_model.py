@@ -19,7 +19,7 @@ LLAMA_API_URL = "http://kumo01:11434/api/generate"
 def test_llama() -> bool:
     # ping llama instance
     try: found = ping("http://kumo01:11434")
-    except socket.error as e: found = False
+    except socket.error: found = False
 
     # report to user
     if found: logger.info("using llama Local Model")

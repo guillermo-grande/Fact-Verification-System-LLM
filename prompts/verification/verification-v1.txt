@@ -1,0 +1,12 @@
+Queremos comprobar la veracidad de un hecho llamado 'query'. Para ello, se ha dividido en pequeñas afirmaciones llamadas 'atomic_claim'. Para cada 'atomic_claim' tenemos una serie de hechos 'claims' que vienen acompañados cada uno por una serie de evicencias 'evidence' y una etiqueta 'claim_label' indicando su apoyo al hecho ('0': afirma el hecho, '1': refuta el hecho, '2': no dispone de información suficiente). Cada evidencia tiene:
+- Una etiqueta 'evidence_label' indicando su apoyo al hecho ('0': afirma el hecho, '1': refuta el hecho, '2': no dispone de información suficiente).
+- Una entropía 'entropy' que refleja la incertidumbre de 'evidence_label'.
+Dada esta información, se debe indicar si 'query' es verdadero o falso, analizando cada atomic_claim por separado, indicando las evidencias con las que se llega a tal conclusión.
+EJEMPLO:
+query: La capa de ozono está abierta sobre el mar rojo, cuyo nivel está subiendo debido a el cambio climático.
+	atomic_claim: "The ozone layer is open over the Red Sea.",
+        claim:
+		claim_label: 0,
+		evidence: "Recent studies show the ozone layer
+    atomic_claim: "The sea level of the Red Sea is rising.",
+    atomic_claim: "The rising sea level of the Red Sea is due to climate change."

@@ -1,8 +1,11 @@
 from collections import defaultdict
 from dotenv import load_dotenv; load_dotenv() # load API KEYs
 
+from llama_index.core.schema import NodeWithScore
+
 import os
 import requests
+from numpy import argmin 
 
 # Configuración de logging
 import logging
@@ -58,6 +61,25 @@ def query_llama(prompt: str, temperature: float = 0.2, max_tokens: int = 256):
         logger.critical(f"Error al consultar el modelo Llama 3.2: {e}")
         raise
 
+def verification_consensus(claim: str, evidence: list[NodeWithScore]) -> tuple[int, str]:
+    """Calls an LLM model to determine the veracity of an atomic claim based on a list of evidence
+    notes. The model uses determine if the evidence supports or refutes the claim or if there is no
+    enough evidence to generate a conclusion.
+
+    Args:
+        claim (str): atomic claim that is going to be verified.
+        evidence (list[NodeWithScore]): list of evidences text nodes. 
+
+    Returns:
+        int: integer value of the conclusion. It has the same map as the evidence label.
+        str: full message of the llm response. This can be used to report to the user why it obtained the results.
+    """
+    # TODO
+    # my recommeendation is to use QueryEngine so it returns the text with the citations.
+    # https://docs.llamaindex.ai/en/stable/examples/workflow/citation_query_engine/
+
+    return 0, ""
+
 def verification_pipeline(query: str) -> str:
     """
     Runs the full pipeline
@@ -86,27 +108,41 @@ def verification_pipeline(query: str) -> str:
 
     # get claims
     all_evidences = []
+    all_consensus = []
     for claim_id, atomic in enumerate(atomic_claims):
-
-        support   = defaultdict(lambda : 0)
         evidences = retrieve_engine.retrieve(atomic)
-        
-        print("claim:", atomic)
-        for e in evidences:
-            label = map_evidence_label[str(e.metadata.get("evidence_label"))]
-            support[label] += e.metadata.get('entropy') 
-            print(f"Evidencia: 1\nText:{e.text}\nevidence_label: {label}\nentropy: {e.metadata.get('entropy')}")
-            print()
-        
-        print("soporte: ", dict(support))
-        print()
+
+        if len(evidences) == 0: 
+            # TODO: deal with this case. It is neccesary
+            print("soporte: ni idea")
+            continue
+
+        consensus = verification_consensus(atomic, evidences)
+        all_consensus.append(consensus)
         all_evidences.extend(evidences)
+        
+        # support   = {0: [], 1: [], 2: []}
+        # print("claim:", atomic)
+        # for e in evidences:
+        #     label = map_evidence_label[str(e.metadata.get("evidence_label"))]
+        #     label_id = int(e.metadata.get("evidence_label"))
+        #     support[label_id].append(e.metadata.get("entropy"))
 
-    """
-    
-    """
+        #     print(f"Evidencia: 1\nText:{e.text}\nevidence_label: {label}\nentropy: {e.metadata.get('entropy')}")
+        #     print()
 
-    return all_evidences
+
+        # print(support)
+        # avg_support = {}
+        # for id in support.keys(): 
+        #     if len(support[id]) > 0: avg_support[id] = sum(support[id]) / len(support[id])
+        
+        # min_id = min(avg_support, key = avg_support.get)
+        # print(f"soporte: {map_evidence_label[str(min_id)]} (score: {avg_support[min_id]})")
+        # print()
+
+
+    return all_consensus
 
 if __name__ == "__main__":
     # Pregunta del usuario

@@ -1,0 +1,28 @@
+name: rag-311
+channels:
+  - conda-forge
+dependencies:
+  - chromadb=0.5.23
+  - conda=24.11.0
+  - dataset=1.6.2
+  - llama-index=0.12.3
+  - pip=24.3.1
+  - python=3.11.10
+  - transformers=4.46.3
+  - pip:
+      - anaconda-anon-usage==0.4.4
+      - Brotli==1.0.9
+      - bump-my-version==0.28.1
+      - conda-content-trust==0.2.0
+      - conda-env-export==0.6.1
+      - cookiecutter==2.6.0
+      - docutils==0.21.2
+      - jinja2-time==0.2.0
+      - ollama==0.4.2
+      - pre-commit==4.0.1
+      - PySocks==1.7.1
+      - tomli==2.1.0
+      - tox==4.23.2
+      - ukkonen==1.0.1
+      - wheel==0.43.0
+      - win-inet-pton==1.1.0
