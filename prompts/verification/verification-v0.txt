@@ -33,40 +33,5 @@ Sources: Report by the International Energy Agency, cited academic study.
 
 Example to resolve:
 
-Claim: "The rising sea level of the Red Sea is due to climate change."
-Evidences:
-
-Evidence: 1
-Text:for instance, mercer published a study in 1978 predicting that anthropogenic carbon dioxide warming and its potential effects on climate in the 21st century could cause a sea level rise of around 5 metres (16 ft) from melting of the west antarctic ice-sheet alone.     
-evidence_label: not_enough_information
-entropy: 0.3068528175354004
-
-Evidence: 2
-Text:between 1993 and 2017, the global mean sea level rose on average by 3.1 ± 0.3 mm per year, with an acceleration detected as well.
-evidence_label: refutes
-entropy: 0.0
-
-Evidence: 3
-Text:between 1900 and 2016, the sea level rose by 16–21 cm (6.3–8.3 in).
-evidence_label: not_enough_information
-entropy: 0.6365141868591309
-
-Evidence: 4
-Text:for at least the last 100 years, sea level has been rising at an average rate of about 1.8 mm (0.07 in) per year.
-evidence_label: refutes
-entropy: 0.6365141868591309
-
-Evidence: 5
-Text:between 1993 and 2017, the global mean sea level rose on average by 3.1 ± 0.3 mm per year, with an acceleration detected as well.
-evidence_label: refutes
-entropy: 0.6365141868591309
-
-Evidence: 6
-Text:between 1900 and 2016, the sea level rose by 16–21 cm (6.3–8.3 in).
-evidence_label: not_enough_information
-entropy: 0.0
-
-Evidence: 7
-Text:since at least the start of the 20th century, the average global sea level has been rising.
-evidence_label: not_enough_information
-entropy: 1.0986123085021973
+Claim: {}
+Evidences: {}

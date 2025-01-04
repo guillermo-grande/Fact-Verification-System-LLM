@@ -11,6 +11,7 @@ def configure_routes(app):
     @app.route('/send-message', methods=['POST'])
     def send_message():
         user_message = request.form.get('message')
+        return jsonify({"result": "Fact verification result here!"})
         
     @app.route('/verify')
     def verify_fact():

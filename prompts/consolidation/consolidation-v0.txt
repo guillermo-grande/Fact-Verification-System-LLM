@@ -1,0 +1,9 @@
+Determina si la siguiente claim es verdadera, falsa o inconclusiva. Escribe únicamente la palabra y una pequeña explicación:
+
+Claim: {original_claim}
+
+Según las siguientes afirmaciones presentadas:
+
+{atomics}
+
+Answer: 

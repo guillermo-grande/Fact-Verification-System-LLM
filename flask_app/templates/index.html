@@ -39,7 +39,7 @@
                     <div class="card-footer bg-light">
                         <form id="chat-form" method="POST" action="/send-message" class="d-flex">
                             <input type="text" class="form-control me-2" name="message" placeholder="Type your message..." required>
-                            <button type="submit" class="btn btn-primary">Send</button>
+                            <button type="button" class="btn btn-primary">Send</button>
                         </form>
                     </div>
                 </div>
@@ -57,4 +57,34 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
+<script lang="js">
+    const verifyBtn = document.getElementsByClassName("btn btn-primary");
+    verifyBtn.addEventListener("click", (event) => {
+        // Obtener el mensaje del usuario
+        const userMessage = document.querySelector("input[name='message']").value;
+
+        // Verificar que el campo no esté vacío
+        if (userMessage.trim() === "") {
+            alert("Por favor, escribe un mensaje.");
+            return;
+        }
+
+        // Crear el contenedor del nuevo mensaje
+        const messageDiv = document.createElement("div");
+        messageDiv.classList.add("message", "user-message");
+        messageDiv.innerHTML = `<strong>User:</strong> ${userMessage}`;
+
+        // Agregar el nuevo mensaje al chat
+        document.getElementById("chat-box").appendChild(messageDiv);
+
+        // Limpiar el campo de texto
+        document.querySelector("input[name='message']").value = "";
+
+        // Hacer scroll hacia el fondo para mostrar el nuevo mensaje
+        document.getElementById("chat-box").scrollTop = document.getElementById("chat-box").scrollHeight;
+    })
+
+
+</script>
 </html>

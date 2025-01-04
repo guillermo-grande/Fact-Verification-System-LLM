@@ -1,6 +1,6 @@
 
-from llm_model import llm, LLAMA_AVAILABLE
-from utils import load_prompt
+from fact_checker.llm_model import llm, LLAMA_AVAILABLE
+from fact_checker.utils import load_prompt
 
 PROMPT_VERSION: int = 1
 DECOMPOSE_PROMPT = load_prompt("decompose", PROMPT_VERSION)
@@ -30,7 +30,7 @@ def decompose_query(query: str) -> list[str]:
     return processed_response
 
 if __name__ == '__main__':
-    test_claim = "La capa de ozono está abierta sobre el mar rojo, cuyo nivel está subiendo debido a el cambio climático"
+    test_claim = "Los osos polares se mueren por el cambio climático"
     atomic_claims = decompose_query(test_claim)
     print("atomic claims: ")
     for i, claim in enumerate(atomic_claims):

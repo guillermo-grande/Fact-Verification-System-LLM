@@ -244,6 +244,7 @@ class EvidenceClaimRetriever(BaseRetriever):
         if len(filtered_claims) == 0: return []
 
         claim_ids = [claim.metadata.get('claim_id') for claim in filtered_claims]
+        self.last_claims = filtered_claims
 
         # Define metadata filter
         filters = MetadataFilters(
@@ -267,7 +268,7 @@ class EvidenceClaimRetriever(BaseRetriever):
         return evidences
 
 if __name__ == '__main__':
-    from utils import configure_logger
+    from fact_checker.utils import configure_logger
 
     logger = configure_logger(logger, 'INFO')
     retriever = EvidenceClaimRetriever(3, 5)
