@@ -1,0 +1,50 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #343a40; /* Background for body */
+}
+
+#chat-box p {
+    margin-bottom: 12px;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+#chat-box p strong {
+    color: #009c8c; /* Blue for AI or user names */
+}
+
+.card {
+    border-radius: 16px; /* Rounded corners for a modern look */
+}
+
+.card-footer {
+    border-top: 2px solid #ddd;
+}
+
+button.btn-primary {
+    border-radius: 50px;
+    padding: 0.5rem 1.5rem;
+    font-weight: bold;
+    background-color: #009c8c;
+}
+
+/* Background color */
+.custom-bg {
+    background-color: #FFFFFF; /* Dark gray for a sleek look */
+}
+
+/* Header */
+.custom-header {
+    background-color: #009c8c; /* Google blue for header */
+}
+
+/* Footer */
+.custom-footer {
+    background-color: #009c8c; /* Deep blue for footer */
+}
+
+/* Chat Header (optional styling for the card's header) */
+.custom-chat-header {
+    background-color: #009c8c; /* Green for chat header */
+    border-bottom: 2px solid #009c8c;
+}
