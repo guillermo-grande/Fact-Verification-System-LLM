@@ -71,6 +71,13 @@
         // Prevent the default form submission
         event.preventDefault();
     });
+    document.getElementById('message-input').addEventListener("keypress", (event) => {
+        console.log("pressed key", event.key)
+        if (event.key === "Enter") {
+            event.preventDefault();
+            document.getElementById("send-button").click();
+        }
+    });
 
     document.getElementById('send-button').addEventListener('click', function() {
         // Get the input value

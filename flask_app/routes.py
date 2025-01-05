@@ -81,9 +81,9 @@ def configure_routes(app):
             n_sources = sum([ len(atomic['sources']) for atomic in response['atomics']])
             if n_sources != 0:
 
-                source_details += """<
+                source_details += """
                 <details>
-                    <summary class="">See sources: </summary>
+                    <summary class="fw-bold">See sources / Ver fuentes: </summary>
                     <ol class="source-list">
                 """
                 
@@ -91,10 +91,9 @@ def configure_routes(app):
                 sources = [atomic.get('sources', []) for atomic in response['atomics']]
                 sources = [source for row in sources for source in row]
 
-                print(sources)
                 for sid in source_ids:
                     source = sources[sid]
-                    source['evidence'] = source_filter.match(source['evidence']).group(1)
+                    source['evidence'] = source_filter.match(source['evidence']).group(1).capitalize()
                     source_details += f"""
                         <li>{source['evidence']}<br> <i class="ms-4 fw-bold">{source['article']}</i> </li>
                     """

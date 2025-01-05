@@ -38,6 +38,9 @@ body {
     background-color: #ebf0ee;
 }
 
+ul > li > span {
+    display: flex;
+}
 
 .chat-box div strong {
     color: #009c8c; /* Blue for AI or user names */
