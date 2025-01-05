@@ -1,10 +1,10 @@
-Determine if the following claim is true, false, inconclusive, or without evidence. Write only the word and a brief explanation.
-Respond in English.
+Determine, according to the given statements, if the following claim is true, false, inconclusive, or there is no evidence in the statements. 
+Write only the word ("True", "False", "Inconclusive" or "no evidence" and explain that the database does not contain evidence to answer the claim).
+Answer in English. If no statements are given, answer that there is no evidence.
 
 Claim: {query}
 
-According to the following statements:
-
+Statements:
 {atomics}
 
 Answer: 

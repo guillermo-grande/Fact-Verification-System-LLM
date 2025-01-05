@@ -28,8 +28,8 @@ from llama_index.core.response_synthesizers import BaseSynthesizer, ResponseMode
 
 import re
 
-from transformers import MarianMTModel, MarianTokenizer
-from langdetect import detect
+#from transformers import MarianMTModel, MarianTokenizer
+#from langdetect import detect
 
 #--------------------------------------------------------------------
 # Data Retriever
@@ -51,7 +51,7 @@ PROMPT_CONSOLIDATION = PromptTemplate(CLAIM_CONSOLIDATION)
 #--------------------------------------------------------------------
 # Verification Model
 #--------------------------------------------------------------------
-conclusion_pattern = re.compile('CONCLUSION: "([\w\s\d]*)"')
+conclusion_filter  = re.compile('CONCLUSION: "([\w\s\d]*)"\s*EXPLANATION:\s+((.|\n)*)')
 def verification_consensus(claim: str) -> tuple[EvidenceEnum, str]:
     """Calls an LLM model to determine the veracity of an atomic claim based on a list of evidence
     notes. The model uses determine if the evidence supports or refutes the claim or if there is no
@@ -87,7 +87,9 @@ def verification_consensus(claim: str) -> tuple[EvidenceEnum, str]:
         response.response = "Sorry, there is not enough information about this topic in the database"
         return EvidenceEnum.NO_EVIDENCE, response
     
-    claim_check = conclusion_pattern.match(response.response).group(1)
+    claim_group = conclusion_filter.match(response.response)
+    claim_check = claim_group.group(1)
+    response.response = claim_group.group(2)
     return EvidenceEnum.from_str(claim_check), response
 
 #--------------------------------------------------------------------
@@ -110,22 +112,11 @@ def verification_pipeline(query: str) -> str:
     all_consensus = []
     consolidation_atomics = ""
     for claim_id, atomic in enumerate(atomic_claims):
-        decision, response = consensus = verification_consensus(atomic)
+        decision, _ = consensus = verification_consensus(atomic)
         all_consensus.append((atomic, *consensus))
         
         consensus_atomic = f"atomic: {atomic}\nvalidation: {str(decision)}"
         consolidation_atomics += consensus_atomic + "\n"
-
-    """
-    consolidation_atomics:
-
-    atomic: The ozone layer is open over the Red Sea.
-    validation: no evidence
-    atomic: The sea level of the Red Sea is rising.
-    validation: no evidence
-    atomic: The rising sea level of the Red Sea is due to climate change.
-    validation: not enough evidence
-    """
     
     consolidation_prompt = PROMPT_CONSOLIDATION.format(query=query, atomics=consolidation_atomics)
     consolidation_response = llm.complete(consolidation_prompt)
@@ -150,14 +141,8 @@ def verification_pipeline(query: str) -> str:
         ]
     }
 
-
-    from pprint import pprint
-    from json   import dumps
-    print("final output: ")
-    print(dumps(ret, indent = 2, ))
-
-    return all_consensus
-
+    return ret
+'''
 def translate_query(query, source_language, target_language):
     model_name = f"Helsinki-NLP/opus-mt-{source_language}-{target_language}"
     tokenizer = MarianTokenizer.from_pretrained(model_name)
@@ -166,17 +151,18 @@ def translate_query(query, source_language, target_language):
     inputs = tokenizer(query, return_tensors="pt", padding=True, truncation=True)
     translated_tokens = model.generate(**inputs)
     return tokenizer.decode(translated_tokens[0], skip_special_tokens=True)
-
+'''
 if __name__ == "__main__":
     
     # Pregunta del usuario
-    user_query = "Los osos polares se mueren por el cambio climático."
-    
+    user_query = "La quema de combustibles fósiles es la principal causa del cambio climático."
+    '''
     input_language = detect(user_query)
     if input_language != "en":  # Si no está en inglés, traduce
         query = translate_query(user_query, target_language="en")
+    '''
     # Consultar y generar respuesta
     # try:
-    documents = verification_pipeline(query)
+    documents = verification_pipeline(user_query)
     # except Exception as e:
     #     logger.error(f"Error al ejecutar la consulta: {e}")

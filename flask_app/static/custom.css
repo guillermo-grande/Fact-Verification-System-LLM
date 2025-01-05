@@ -1,15 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
 body {
-    font-family: "Arial", sans-serif;
+    font-family: "Roboto", serif;
     background-color: #343a40; /* Background for body */
+}
+
+* {
+    text-align: justify;
+    scrollbar-gutter: stable;
+    font-size : 16px;
 }
 
 .chat-box div {
     outline: black;
     margin-bottom: 12px;
-    font-size: 1rem;
     line-height: 1.5;
     border: 1px black;
 }
+
+.chat-msg {
+    display: flex;
+    margin-bottom: 2rem;
+}
+.chat-msg > span {
+    overflow: auto;
+
+    /* min-width: 40rem; */
+
+    display: flex;
+    row-gap: 2rem;
+    
+    margin-left: auto;
+    
+    padding: 12px 16px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    background-color: #ebf0ee;
+}
+
 
 .chat-box div strong {
     color: #009c8c; /* Blue for AI or user names */
@@ -17,11 +45,22 @@ body {
 
 ol.source-list {
     list-style: none;
+    counter-reset: item;
 }
 
 ol.source-list > li:before {
+    display: inline-block;
     content: "[" counter(item) "]";
+    font-weight: 500;
     counter-increment: item;
+    margin-left: -2rem;
+    width: 2rem;
+}
+
+ol.source-list > li {
+    margin-bottom: 0.5rem;
+    display: block;
+    margin-left: 2rem;
 }
 
 .card {
@@ -29,7 +68,7 @@ ol.source-list > li:before {
 }
 
 .card-footer {
-    border-top: 2px solid #ddd;
+    border-top: 2px solid #eeeeee;
 }
 
 button.btn-primary {
@@ -58,4 +97,12 @@ button.btn-primary {
 .custom-chat-header {
     background-color: #009c8c; /* Green for chat header */
     border-bottom: 2px solid #009c8c;
+    width: 100%;
+    padding-top: 1rem;
+}
+
+.custom-chat-header > h2 {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
 }

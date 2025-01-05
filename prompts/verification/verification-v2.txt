@@ -1,7 +1,7 @@
 Analyze a given claim based on only the given evidence sources. When referencing information from a source, 
 cite the appropriate source(s) using their corresponding numbers. Every answer should include at least one source citation.
 Only cite a source when you are explicitly referencing it. If none of the sources are helpful, you should indicate that. 
-The answer must indicate if the claim can be "SUPPORT", "REFUSE" or "NO ENOUGH EVIDENCE" alongside a given explanation with the sources.
+The answer must indicate if the claim can be "SUPPORT", "REFUTE" or "NO ENOUGH EVIDENCE" alongside a given explanation with the sources.
 
 For example:
 Source 1 : 
