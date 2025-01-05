@@ -1,16 +1,27 @@
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: "Arial", sans-serif;
     background-color: #343a40; /* Background for body */
 }
 
-#chat-box p {
+.chat-box div {
+    outline: black;
     margin-bottom: 12px;
     font-size: 1rem;
     line-height: 1.5;
+    border: 1px black;
 }
 
-#chat-box p strong {
+.chat-box div strong {
     color: #009c8c; /* Blue for AI or user names */
+}
+
+ol.source-list {
+    list-style: none;
+}
+
+ol.source-list > li:before {
+    content: "[" counter(item) "]";
+    counter-increment: item;
 }
 
 .card {
@@ -23,7 +34,7 @@ body {
 
 button.btn-primary {
     border-radius: 50px;
-    padding: 0.5rem 1.5rem;
+    padding: 0.5rem 0.5rem;
     font-weight: bold;
     background-color: #009c8c;
 }

@@ -28,6 +28,9 @@ from llama_index.core.response_synthesizers import BaseSynthesizer, ResponseMode
 
 import re
 
+from transformers import MarianMTModel, MarianTokenizer
+from langdetect import detect
+
 #--------------------------------------------------------------------
 # Data Retriever
 #--------------------------------------------------------------------
@@ -103,12 +106,6 @@ def verification_pipeline(query: str) -> str:
     # decompose into multiple atomic claims
     atomic_claims = decompose_query(query)
 
-    atomic_claims = [
-        "The ozone layer is open over the Red Sea.",                    # no evidence 
-        "The sea level of the Red Sea is rising.",                      # no evidence
-        "The rising sea level of the Red Sea is due to climate change." # not enough
-    ]
-
     # get claims
     all_consensus = []
     consolidation_atomics = ""
@@ -132,8 +129,6 @@ def verification_pipeline(query: str) -> str:
     
     consolidation_prompt = PROMPT_CONSOLIDATION.format(query=query, atomics=consolidation_atomics)
     consolidation_response = llm.complete(consolidation_prompt)
-    print("consolidation response: ")
-    print(consolidation_response.text)
 
     ret =  {
         'claim': query,
@@ -163,11 +158,23 @@ def verification_pipeline(query: str) -> str:
 
     return all_consensus
 
+def translate_query(query, source_language, target_language):
+    model_name = f"Helsinki-NLP/opus-mt-{source_language}-{target_language}"
+    tokenizer = MarianTokenizer.from_pretrained(model_name)
+    model = MarianMTModel.from_pretrained(model_name)
+
+    inputs = tokenizer(query, return_tensors="pt", padding=True, truncation=True)
+    translated_tokens = model.generate(**inputs)
+    return tokenizer.decode(translated_tokens[0], skip_special_tokens=True)
+
 if __name__ == "__main__":
     
     # Pregunta del usuario
-    query = "Los osos polares se mueren por el cambio climático."
+    user_query = "Los osos polares se mueren por el cambio climático."
     
+    input_language = detect(user_query)
+    if input_language != "en":  # Si no está en inglés, traduce
+        query = translate_query(user_query, target_language="en")
     # Consultar y generar respuesta
     # try:
     documents = verification_pipeline(query)

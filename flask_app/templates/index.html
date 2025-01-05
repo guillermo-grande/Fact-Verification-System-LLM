@@ -24,19 +24,60 @@
         <!-- Main Chat Section -->
         <div class="row flex-grow-1">
             <div class="col d-flex justify-content-center align-items-center">
-                <div class="card shadow-lg w-75" style="height: 80%; max-height: 800px;">
+                <div class="card shadow-lg w-80 d-flex justify-content-center align-items-center" style="height: 90%">
                     <!-- Chat Header -->
-                    <div class="card-header custom-chat-header text-white text-center">
+                    <div class="card-header custom-chat-header text-white text-center w-100">
                         <h4>Ask me anything about Climate Change</h4>
                     </div>
 
                     <!-- Chat Messages -->
-                    <div id="chat-box" class="card-body p-4 overflow-auto" style="background-color: #ffffff; color: #333; margin-left: 100px; margin-top: 10px;">
-                        <p><strong>AI:</strong> Hi there! I'm here to help you with your doubts about climate change. </p>
+                    <div id="chat-box" class="card-body overflow-auto" style="background-color: #ffffff; color: #333; margin-top: 10px; padding: 10px 50px; width: 100%">
+                        <div class="mb-4">
+                            <strong>AI:</strong> Hi there! I'm here to help you with your doubts about climate change.                              
+                        </div>
+                        <div class="text-end mb-4">
+                            <strong>You:</strong> Climate change is fake.
+                        </div>
+                        <div class="d-flex flex-row mb-4 me-5">
+                            <strong>AI:</strong>
+                            <div>
+                                <p>The claim "Los osos polares se mueren por el cambio clim\u00e1tico." is "Inconcluso. Aunque el cambio clim\u00e1tico afecta a los osos polares, no hay evidencia directa en las declaraciones proporcionadas que vincule espec\u00edficamente la muerte de los osos polares con el cambio clim\u00e1tico." based on the following:</p>
+                                <ul>
+                                    <li>
+                                        <span class="fw-bold">The ozone layer is open over the Red Sea</span>
+                                        <p>
+                                            Sorry, there is not enough information about this topic in the database
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p>"The sea level of the Red Sea is rising.": "Sorry, there is not enough information about this topic in the database"</p>
+                                    </li>
+                                    <li>
+                                        <span class="fw-bold">The rising sea level of the Red Sea is due to climate change.</span>
+                                        <p>
+                                            The provided sources discuss sea level rise in general and its historical trends, but they do not specifically address the causes of rising sea levels in the Red Sea or link it directly to climate change. While there is evidence of global sea level rise and its acceleration [2], [3], [4], the claim lacks direct support regarding the specific impact of climate change on the Red Sea's sea level. Therefore, there is insufficient evidence to conclusively support the claim.
+                                        </p>
+                                    </li>
+                                </ul>
+                                <details>
+                                    <summary class="">See sources</summary>
+                                    <ol class="source-list">
+                                        <li>
+                                            For instance, mercer published a study in 1978 predicting that anthropogenic carbon dioxide warming and its potential effects on climate in the 21st century could cause a sea level rise of around 5 metres (16\u00a0ft) from melting of the west antarctic ice-sheet alone.
+                                            <br>
+                                            <strong>Sea Level Rise </strong>
+                                        </li>
+                                        <li>
+                                            Sea level rise: "Source 1:\nfor instance, mercer published a study in 1978 predicting that anthropogenic carbon dioxide warming and its potential effects on climate in the 21st century could cause a sea level rise of around 5 metres (16\u00a0ft) from melting of the west antarctic ice-sheet alone.\n"
+                                        </li>
+                                    </ol>
+                                </details>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Chat Input -->
-                    <div class="card-footer bg-light">
+                    <div class="card-footer bg-light w-100">
                         <form id="chat-form" class="d-flex" autocomplete="off">
                             <input type="text" id="message-input" class="form-control me-2" name="message" placeholder="Type your message..." required>
                             <button type="button" id="send-button" class="btn btn-primary">Send</button>
@@ -56,6 +97,10 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+
 </body>
 
 <script lang="js">
@@ -73,10 +118,10 @@
         if (message) {
             // Add the message to the chat
             const chatBox = document.getElementById('chat-box');
-            const userMessage = document.createElement('p');
+            const userMessage = document.createElement('div');
             userMessage.innerHTML = `<strong>You:</strong> ${message}`;
             userMessage.classList.add('text-end');
-            userMessage.style.marginRight = '100px';
+            //userMessage.style.marginRight = '100px';
             chatBox.appendChild(userMessage);
 
             // Scroll to the bottom of the chat box
@@ -96,7 +141,7 @@
                 .then(response => response.json())
                 .then(data => {
                     // Add the server's response to the chat
-                    const serverMessage = document.createElement('p');
+                    const serverMessage = document.createElement('div');
                     serverMessage.innerHTML = `<strong>AI:</strong> ${data.result}`;
                     chatBox.appendChild(serverMessage);
 

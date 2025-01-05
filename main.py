@@ -1,7 +1,7 @@
 import logging    
 from pprint import pprint
-from fact_checker.query_pipeline import verification_pipeline
-from fact_checker.query_pipeline import logger as verify_logger
+# from fact_checker.query_pipeline import verification_pipeline
+# from fact_checker.query_pipeline import logger as verify_logger
 
 from flask import Flask
 from flask_app.routes import configure_routes

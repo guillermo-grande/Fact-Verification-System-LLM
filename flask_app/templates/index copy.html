@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Change Fact Checker</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='custom.css') }}" rel="stylesheet">
+</head>
+<body class="custom-bg">
+    <!-- Fullscreen container -->
+    <div class="container-fluid vh-100 d-flex flex-column">
+        <!-- Header section -->
+        <div class="row custom-header py-3">
+            <div class="col d-flex align-items-center">
+                <!-- Logo -->
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="me-3" style="height: 50px;">
+                <h1 class="m-0 text-light">Climate Change Fact Checker</h1>
+            </div>
+        </div>
+
+        <!-- Main Chat Section -->
+        <div class="row flex-grow-1">
+            <div class="col d-flex justify-content-center align-items-center">
+                <div class="card shadow-lg w-75" style="height: 80%; max-height: 800px;">
+                    <!-- Chat Header -->
+                    <div class="card-header custom-chat-header text-white text-center">
+                        <h4>Ask me anything about Climate Change</h4>
+                    </div>
+                    <div>
+
+                        <!-- Chat Messages -->
+                        <div id="" class="chat-box card-body p-4 overflow-auto" style="background-color: #ffffff; color: #333; margin-left: 100px; margin-top: 10px;">
+                            <p><strong>AI:</strong> Hi there! I'm here to help you with your doubts about climate change. </p>
+                        </div>
+                        <div id="" class="chat-box card-body p-4 overflow-auto" style="background-color: #ffffff; color: #333; margin-left: 100px; margin-top: 10px;">
+                            <p id="response-general">
+                                Inconcluso. Aunque el cambio clim\u00e1tico afecta a los osos polares, no hay evidencia directa en las declaraciones proporcionadas que vincule espec\u00edficamente la muerte de los osos polares con el cambio clim\u00e1tico.
+                            </p>
+                            <ul class="">
+                                <li class="">The provided sources discuss sea level rise in general and its historical trends, but they do not specifically address the causes of rising sea levels in the Red Sea or link it directly to climate change. While there is evidence of global sea level rise and its acceleration [2], [3], [4], the claim lacks direct support regarding the specific impact of climate change on the Red Sea's sea level. Therefore, there is insufficient evidence to conclusively support the claim.</li>
+                                <li class="">The provided sources discuss sea level rise in general and its historical trends, but they do not specifically address the causes of rising sea levels in the Red Sea or link it directly to climate change. While there is evidence of global sea level rise and its acceleration [2], [3], [4], the claim lacks direct support regarding the specific impact of climate change on the Red Sea's sea level. Therefore, there is insufficient evidence to conclusively support the claim.</li>
+                                <li class="">The provided sources discuss sea level rise in general and its historical trends, but they do not specifically address the causes of rising sea levels in the Red Sea or link it directly to climate change. While there is evidence of global sea level rise and its acceleration [2], [3], [4], the claim lacks direct support regarding the specific impact of climate change on the Red Sea's sea level. Therefore, there is insufficient evidence to conclusively support the claim.</li>
+                                <li class="">The provided sources discuss sea level rise in general and its historical trends, but they do not specifically address the causes of rising sea levels in the Red Sea or link it directly to climate change. While there is evidence of global sea level rise and its acceleration [2], [3], [4], the claim lacks direct support regarding the specific impact of climate change on the Red Sea's sea level. Therefore, there is insufficient evidence to conclusively support the claim.</li>
+                            </ul>
+                        </div>
+                    <!-- <div id="source">
+                            <div class="hidden" id="1"> 
+                                <div>
+                                    <span>Article:</span> Sea level rise
+                                </div>
+                                <div>Source 6:\nbetween 1900 and 2016, the sea level rose by 16\u201321\u00a0cm (6.3\u20138.3\u00a0in).\n</div>
+                            </div>
+                        </div> -->
+                    <!-- Chat Input -->
+                    <div class="card-footer bg-light">
+                        <form id="chat-form" class="d-flex" autocomplete="off">
+                            <input type="text" id="message-input" class="form-control me-2" name="message" placeholder="Type your message..." required minlength="1">
+                            <button type="button" id="send-button" class="btn btn-primary">Send</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer section -->
+        <div class="row custom-footer py-3 text-center">
+            <div class="col">
+                <p class="m-0 text-light">&copy; 2025 Climate Change Fact Checker. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+<script lang="js">
+
+    document.getElementById('chat-form').addEventListener('submit', function(event) {
+        // Prevent the default form submission
+        event.preventDefault();
+    });
+
+    document.getElementById('send-button').addEventListener('click', function() {
+        // Get the input value
+        const messageInput = document.getElementById('message-input');
+        const message = messageInput.value.trim();
+
+        if (message) {
+            // Add the message to the chat
+            const chatBox = document.getElementById('chat-box');
+            const userMessage = document.createElement('p');
+            userMessage.innerHTML = `<strong>You:</strong> ${message}`;
+            userMessage.classList.add('text-end');
+            userMessage.style.marginRight = '100px';
+            chatBox.appendChild(userMessage);
+
+            // Scroll to the bottom of the chat box
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Clear the input field
+            messageInput.value = '';
+
+            // Send the message to the server
+            fetch('/send-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `message=${encodeURIComponent(message)}`,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Add the server's response to the chat
+                    const serverMessage = document.createElement('p');
+                    serverMessage.innerHTML = `<strong>AI:</strong> ${data.result}`;
+                    chatBox.appendChild(serverMessage);
+
+                    // Scroll to the bottom of the chat box
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    });
+
+</script>
+</html>

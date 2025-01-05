@@ -1,5 +1,5 @@
-Determine if the following claim is true, false, inconclusive, or without evidence. Write only the word and a brief explanation. 
-Respond in the language of the claim:
+Determine if the following claim is true, false, inconclusive, or without evidence. Write only the word and a brief explanation.
+Respond in English.
 
 Claim: {query}
 
