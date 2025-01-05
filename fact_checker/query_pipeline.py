@@ -6,6 +6,7 @@ if __name__ == '__main__':
     sys.path.append(str(root))
 
 
+from pprint import pprint
 from dotenv import load_dotenv; load_dotenv() # load API KEYs
 
 # Configuración de logging
@@ -28,8 +29,17 @@ from llama_index.core.response_synthesizers import BaseSynthesizer, ResponseMode
 
 import re
 
-#from transformers import MarianMTModel, MarianTokenizer
-#from langdetect import detect
+from transformers import pipeline
+from langdetect import detect
+
+#----------------------------------------------------------------------------------------
+# Translator
+#----------------------------------------------------------------------------------------
+
+# # Use a pipeline as a high-level helper
+# pipe = pipeline("translation", model="Helsinki-NLP/opus-mt-en-mul")
+# logger.debug("loaded translation model: Helsinki-NLP/opus-mt-en-mul")
+    
 
 #--------------------------------------------------------------------
 # Data Retriever
@@ -47,6 +57,19 @@ CONSOLIDATION_VERSION: int = 2
 CLAIM_CONSOLIDATION: str = load_prompt("consolidation", CONSOLIDATION_VERSION)
 PROMPT_CONSOLIDATION = PromptTemplate(CLAIM_CONSOLIDATION)
 
+TRANSLATION_VERSION: int = 0
+TRANSLATION: str = load_prompt("translation", TRANSLATION_VERSION)
+PROMPT_TRANSLATION = PromptTemplate(TRANSLATION)
+
+
+#--------------------------------------------------------------------
+# Translation
+#--------------------------------------------------------------------
+def translate_text(text: str, src_lang: str, dst_lang: str) -> str:
+    if src_lang == dst_lang: return text
+    
+    translation_prompt = TRANSLATION.format()
+    translation_response = llm.complete(translation_prompt).text
 
 #--------------------------------------------------------------------
 # Verification Model
@@ -95,7 +118,7 @@ def verification_consensus(claim: str) -> tuple[EvidenceEnum, str]:
 #--------------------------------------------------------------------
 # Verification Pipeline
 #--------------------------------------------------------------------
-def verification_pipeline(query: str) -> str:
+def verification_pipeline(user_query: str) -> str:
     """
     Runs the full pipeline
 
@@ -105,6 +128,15 @@ def verification_pipeline(query: str) -> str:
     Returns:
     - str. Text with full response.
     """
+    # translate the query if it is not in English
+    input_language = detect(user_query)
+    # if input_language != "en": 
+    #     query = translate_query(user_query, source_language=input_language, target_language="en")
+    # else:
+    #     query = user_query
+        
+    query = user_query
+
     # decompose into multiple atomic claims
     atomic_claims = decompose_query(query)
 
@@ -124,11 +156,14 @@ def verification_pipeline(query: str) -> str:
     if evidence_found:
         consolidation_prompt = PROMPT_CONSOLIDATION.format(query=query, atomics=consolidation_atomics)
         consolidation_response = llm.complete(consolidation_prompt).text
+        verified = True
     else:
         consolidation_response = "No evidence. The database does not contain evidence to answer the claim."
+        verified = False
     
     ret =  {
         'claim': query,
+        'verified': verified,
         'general': consolidation_response,
         'atomics': [
             {
@@ -145,30 +180,32 @@ def verification_pipeline(query: str) -> str:
             }
             for consensus in all_consensus
         ]
-    }
-    
-    return ret
-'''
-def translate_query(query, source_language, target_language):
-    model_name = f"Helsinki-NLP/opus-mt-{source_language}-{target_language}"
-    tokenizer = MarianTokenizer.from_pretrained(model_name)
-    model = MarianMTModel.from_pretrained(model_name)
+    }    
 
-    inputs = tokenizer(query, return_tensors="pt", padding=True, truncation=True)
-    translated_tokens = model.generate(**inputs)
-    return tokenizer.decode(translated_tokens[0], skip_special_tokens=True)
-'''
+    
+
+
+    return ret
+
+# # Define a function for translation
+# def translate_text(text):
+#     # Translate the text using the pipeline
+#     translation = pipe(text)
+#     # The output is a list of dictionaries, so we extract the translated text
+#     return translation[0]['translation_text']
+
 if __name__ == "__main__":
     
     # Pregunta del usuario
-    user_query = "La quema de combustibles fósiles es la principal causa del cambio climático."
-    '''
-    input_language = detect(user_query)
-    if input_language != "en":  # Si no está en inglés, traduce
-        query = translate_query(user_query, target_language="en")
-    '''
+    user_query = "Costs of burning fossil fuels are higher than the costs of renewable energy sources."
+    
+    #translated_text = translate_text(user_query)
+
+    #pprint(translated_text)
+
+    
     # Consultar y generar respuesta
     # try:
-    documents = verification_pipeline(user_query)
+    # documents = verification_pipeline(query)
     # except Exception as e:
     #     logger.error(f"Error al ejecutar la consulta: {e}")

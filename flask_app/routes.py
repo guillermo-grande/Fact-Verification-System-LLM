@@ -110,7 +110,7 @@ def configure_routes(app):
                     {source_details}
                 """
             
-            if response['general'] == "No evidence. The database does not contain evidence to answer the claim.":
+            if not response['verified']:
                 html_output = f"""
                 <div class="ms-1">
                     <p>
