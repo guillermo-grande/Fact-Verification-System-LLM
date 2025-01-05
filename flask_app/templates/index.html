@@ -31,15 +31,15 @@
                     </div>
 
                     <!-- Chat Messages -->
-                    <div id="chat-box" class="card-body p-4 overflow-auto" style="background-color: #f8f9fa; color: #333;">
+                    <div id="chat-box" class="card-body p-4 overflow-auto" style="background-color: #ffffff; color: #333; margin-left: 100px; margin-top: 10px;">
                         <p><strong>AI:</strong> Hi there! I'm here to help you with your doubts about climate change.</p>
                     </div>
 
                     <!-- Chat Input -->
                     <div class="card-footer bg-light">
-                        <form id="chat-form" method="POST" action="/send-message" class="d-flex">
-                            <input type="text" class="form-control me-2" name="message" placeholder="Type your message..." required>
-                            <button type="button" class="btn btn-primary">Send</button>
+                        <form id="chat-form" class="d-flex" autocomplete="off">
+                            <input type="text" id="message-input" class="form-control me-2" name="message" placeholder="Type your message..." required>
+                            <button type="submit" id="send-button" class="btn btn-primary">Send</button>
                         </form>
                     </div>
                 </div>
@@ -59,32 +59,55 @@
 </body>
 
 <script lang="js">
-    const verifyBtn = document.getElementsByClassName("btn btn-primary");
-    verifyBtn.addEventListener("click", (event) => {
-        // Obtener el mensaje del usuario
-        const userMessage = document.querySelector("input[name='message']").value;
 
-        // Verificar que el campo no esté vacío
-        if (userMessage.trim() === "") {
-            alert("Por favor, escribe un mensaje.");
-            return;
+    document.getElementById('chat-form').addEventListener('submit', function(event) {
+        // Prevent the default form submission
+        event.preventDefault();
+    });
+
+    document.getElementById('send-button').addEventListener('click', function() {
+        // Get the input value
+        const messageInput = document.getElementById('message-input');
+        const message = messageInput.value.trim();
+
+        if (message) {
+            // Add the message to the chat
+            const chatBox = document.getElementById('chat-box');
+            const userMessage = document.createElement('p');
+            userMessage.innerHTML = `<strong>You:</strong> ${message}`;
+            userMessage.classList.add('text-end');
+            userMessage.style.marginRight = '100px';
+            chatBox.appendChild(userMessage);
+
+            // Scroll to the bottom of the chat box
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Clear the input field
+            messageInput.value = '';
+
+            // Send the message to the server
+            fetch('/send-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `message=${encodeURIComponent(message)}`,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Add the server's response to the chat
+                    const serverMessage = document.createElement('p');
+                    serverMessage.innerHTML = `<strong>AI:</strong> ${data.result}`;
+                    chatBox.appendChild(serverMessage);
+
+                    // Scroll to the bottom of the chat box
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         }
-
-        // Crear el contenedor del nuevo mensaje
-        const messageDiv = document.createElement("div");
-        messageDiv.classList.add("message", "user-message");
-        messageDiv.innerHTML = `<strong>User:</strong> ${userMessage}`;
-
-        // Agregar el nuevo mensaje al chat
-        document.getElementById("chat-box").appendChild(messageDiv);
-
-        // Limpiar el campo de texto
-        document.querySelector("input[name='message']").value = "";
-
-        // Hacer scroll hacia el fondo para mostrar el nuevo mensaje
-        document.getElementById("chat-box").scrollTop = document.getElementById("chat-box").scrollHeight;
-    })
-
+    });
 
 </script>
 </html>
