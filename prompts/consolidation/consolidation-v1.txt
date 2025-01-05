@@ -1,0 +1,12 @@
+Determine, according to the given statements, if the following claim is true, false or inconclusive.
+Write only the word ("True", "False", "Inconclusive") and provide a concise explanation of the reasoning behind your decision,
+summarizing the key factors or logic without directly referencing specific statements or details,
+as these won't be visible to the user.
+Answer in English.
+
+Claim: {query}
+
+Statements:
+{atomics}
+
+Answer:

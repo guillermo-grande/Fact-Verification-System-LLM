@@ -43,7 +43,7 @@ VERIFICATION_VERSION: int = 2
 ATOMIC_VERIFICATION: str = load_prompt("verification", VERIFICATION_VERSION)
 PROMPT_VERIFICATION = PromptTemplate(ATOMIC_VERIFICATION)
 
-CONSOLIDATION_VERSION: int = 0
+CONSOLIDATION_VERSION: int = 2
 CLAIM_CONSOLIDATION: str = load_prompt("consolidation", CONSOLIDATION_VERSION)
 PROMPT_CONSOLIDATION = PromptTemplate(CLAIM_CONSOLIDATION)
 
@@ -110,20 +110,26 @@ def verification_pipeline(query: str) -> str:
 
     # get claims
     all_consensus = []
+    evidence_found = False
     consolidation_atomics = ""
     for claim_id, atomic in enumerate(atomic_claims):
         decision, _ = consensus = verification_consensus(atomic)
         all_consensus.append((atomic, *consensus))
-        
+        evidence_found = evidence_found or decision != EvidenceEnum.NO_EVIDENCE
+        # print(f"{claim_id:>2d} - validation: {str(decision)} - atomic: {atomic}")
+
         consensus_atomic = f"atomic: {atomic}\nvalidation: {str(decision)}"
         consolidation_atomics += consensus_atomic + "\n"
     
-    consolidation_prompt = PROMPT_CONSOLIDATION.format(query=query, atomics=consolidation_atomics)
-    consolidation_response = llm.complete(consolidation_prompt)
-
+    if evidence_found:
+        consolidation_prompt = PROMPT_CONSOLIDATION.format(query=query, atomics=consolidation_atomics)
+        consolidation_response = llm.complete(consolidation_prompt).text
+    else:
+        consolidation_response = "No evidence. The database does not contain evidence to answer the claim."
+    
     ret =  {
         'claim': query,
-        'general': consolidation_response.text,
+        'general': consolidation_response,
         'atomics': [
             {
                 'atomic'   : consensus[0], 
@@ -140,7 +146,7 @@ def verification_pipeline(query: str) -> str:
             for consensus in all_consensus
         ]
     }
-
+    
     return ret
 '''
 def translate_query(query, source_language, target_language):
