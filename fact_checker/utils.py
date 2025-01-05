@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 from typing import Literal, Union
 
@@ -54,8 +55,9 @@ def configure_logger(logger: logging.Logger, level: LOGGER_LEVELS = 'INFO') -> l
     Returns:
         logging.Logger: configured logger
     """
-    stream = logging.StreamHandler()
+    stream = logging.StreamHandler(stream = sys.stderr)
     stream.setFormatter(CustomFormatter())
+    
     logger.addHandler(stream)
     logger.setLevel(level)
     return logger

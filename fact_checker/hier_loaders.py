@@ -2,8 +2,9 @@ import os
 import sys
 import logging
 
-from typing import Tuple, List
+from typing import Self, Tuple, List
 
+import enum
 import pandas as pd
 from datasets import load_dataset
 from operator import getitem, attrgetter
@@ -131,6 +132,35 @@ def download_get_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
         claims   = pd.read_parquet("data/climate-claims.parquet.gzip")
 
     return evidence, claims
+
+#----------------------------------------------------------------------------------------
+# Dataset Enum Utils
+#----------------------------------------------------------------------------------------
+class EvidenceEnum(enum.IntEnum):
+    SUPPORTS = 0
+    REFUTES  = 1
+    NO_ENOUGH_EVIDENCE = 2
+    NO_EVIDENCE = 3
+    
+    def __str__(self):
+        label_map = {
+            0: 'supports', 
+            1: 'refutes', 
+            2: "not enough evidence", 
+            3: "no evidence"
+        }
+        return label_map[int(self)]
+
+    @staticmethod
+    def from_str(text) -> Self:
+        label_map = {
+            'supports': EvidenceEnum.SUPPORTS , 
+            'refutes': EvidenceEnum.REFUTES, 
+            "not enough evidence": EvidenceEnum.NO_ENOUGH_EVIDENCE, 
+            "no evidence": EvidenceEnum.NO_EVIDENCE
+        }
+        return label_map[text.lower().strip()]
+
 
 #----------------------------------------------------------------------------------------
 # Chroma DB Client

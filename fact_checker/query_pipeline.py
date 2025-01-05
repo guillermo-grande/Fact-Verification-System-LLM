@@ -16,7 +16,7 @@ logger = configure_logger(logger, 'INFO')
 
 from fact_checker.llm_model    import llm, LLAMA_AVAILABLE
 from fact_checker.utils        import load_prompt
-from fact_checker.hier_loaders import EvidenceClaimRetriever
+from fact_checker.hier_loaders import EvidenceClaimRetriever, EvidenceEnum
 
 from fact_checker.decomposer   import decompose_query
 
@@ -36,15 +36,20 @@ retrieve_engine = EvidenceClaimRetriever(3, 25)
 #--------------------------------------------------------------------
 # Prompts Static Loading
 #--------------------------------------------------------------------
-ATOMIC_VERSION: int = 2
-ATOMIC_VERIFICATION: int = load_prompt("verification", ATOMIC_VERSION)
+VERIFICATION_VERSION: int = 2
+ATOMIC_VERIFICATION: str = load_prompt("verification", VERIFICATION_VERSION)
 PROMPT_VERIFICATION = PromptTemplate(ATOMIC_VERIFICATION)
+
+CONSOLIDATION_VERSION: int = 0
+CLAIM_CONSOLIDATION: str = load_prompt("consolidation", CONSOLIDATION_VERSION)
+PROMPT_CONSOLIDATION = PromptTemplate(CLAIM_CONSOLIDATION)
+
 
 #--------------------------------------------------------------------
 # Verification Model
 #--------------------------------------------------------------------
 conclusion_pattern = re.compile('CONCLUSION: "([\w\s\d]*)"')
-def verification_consensus(claim: str) -> tuple[str, str]:
+def verification_consensus(claim: str) -> tuple[EvidenceEnum, str]:
     """Calls an LLM model to determine the veracity of an atomic claim based on a list of evidence
     notes. The model uses determine if the evidence supports or refutes the claim or if there is no
     enough evidence to generate a conclusion.
@@ -53,7 +58,7 @@ def verification_consensus(claim: str) -> tuple[str, str]:
         claim (str): atomic claim that is going to be verified.
 
     Returns:
-        str: integer value of the conclusion. It has the same map as the evidence label.
+        EvidenceEnum: integer value of the conclusion. It has the same map as the evidence label.
         str: full message of the LLM response. This can be used to report to the user why it obtained the results.
     """
     # TODO
@@ -75,17 +80,16 @@ def verification_consensus(claim: str) -> tuple[str, str]:
 
     # process text
     if len(response.source_nodes) == 0: 
-        # TODO: no determine what to return
-        return 2, response
+        # # TODO: no determine what to return
+        response.response = "Sorry, there is not enough information about this topic in the database"
+        return EvidenceEnum.NO_EVIDENCE, response
     
-    claim_check = conclusion_pattern.match(response.get_text())
-    print(claim_check)
-    return 1, response
+    claim_check = conclusion_pattern.match(response.response).group(1)
+    return EvidenceEnum.from_str(claim_check), response
 
 #--------------------------------------------------------------------
 # Verification Pipeline
 #--------------------------------------------------------------------
-
 def verification_pipeline(query: str) -> str:
     """
     Runs the full pipeline
@@ -98,23 +102,65 @@ def verification_pipeline(query: str) -> str:
     """
     # decompose into multiple atomic claims
     atomic_claims = decompose_query(query)
-    # atomic_claims = [
-    #     "The ozone layer is open over the Red Sea.",  # no evidnece 
-    #     "The sea level of the Red Sea is rising.",    # no evidence
-    #     "The rising sea level of the Red Sea is due to climate change." # not enough
-    # ]
-    # claim grande -> atomic -> [yes | no] -> yes -> no (no se puede, pq esta claim esta dentro es falsa)
+
+    atomic_claims = [
+        "The ozone layer is open over the Red Sea.",                    # no evidence 
+        "The sea level of the Red Sea is rising.",                      # no evidence
+        "The rising sea level of the Red Sea is due to climate change." # not enough
+    ]
 
     # get claims
     all_consensus = []
     consolidation_atomics = ""
     for claim_id, atomic in enumerate(atomic_claims):
-        consensus = verification_consensus(atomic)
-        all_consensus.append(consensus)
+        decision, response = consensus = verification_consensus(atomic)
+        all_consensus.append((atomic, *consensus))
         
-        consensus_atomic = f"atomic: {atomic}\nvalidation: {consensus[0]}"
+        consensus_atomic = f"atomic: {atomic}\nvalidation: {str(decision)}"
         consolidation_atomics += consensus_atomic + "\n"
-        
+
+    """
+    consolidation_atomics:
+
+    atomic: The ozone layer is open over the Red Sea.
+    validation: no evidence
+    atomic: The sea level of the Red Sea is rising.
+    validation: no evidence
+    atomic: The rising sea level of the Red Sea is due to climate change.
+    validation: not enough evidence
+    """
+    
+    consolidation_prompt = PROMPT_CONSOLIDATION.format(query=query, atomics=consolidation_atomics)
+    consolidation_response = llm.complete(consolidation_prompt)
+    print("consolidation response: ")
+    print(consolidation_response.text)
+
+    ret =  {
+        'claim': query,
+        'general': consolidation_response.text,
+        'atomics': [
+            {
+                'atomic'   : consensus[0], 
+                'consensus': str(consensus[1]),
+                'response' : str(consensus[2]) ,
+                'sources'  : [
+                    {
+                        'article': source.node.metadata.get("article") ,
+                        'evidence': source.node.get_text()
+                    }
+                    for source in consensus[2].source_nodes
+                ]
+            }
+            for consensus in all_consensus
+        ]
+    }
+
+
+    from pprint import pprint
+    from json   import dumps
+    print("final output: ")
+    print(dumps(ret, indent = 2, ))
+
     return all_consensus
 
 if __name__ == "__main__":

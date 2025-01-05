@@ -1,0 +1,55 @@
+{
+    "claim": "Los osos polares se mueren por el cambio clim\u00e1tico.",
+    "general": "Inconcluso. Aunque el cambio clim\u00e1tico afecta a los osos polares, no hay evidencia directa en las declaraciones proporcionadas que vincule espec\u00edficamente la muerte de los osos polares con el cambio clim\u00e1tico.",
+    "atomics": [
+        {
+            "atomic": "The ozone layer is open over the Red Sea.",
+            "consensus": "no evidence",
+            "response": "Sorry, there is not enough information about this topic in the database",
+            "sources": []
+        },
+        {
+            "atomic": "The sea level of the Red Sea is rising.",
+            "consensus": "no evidence",
+            "response": "Sorry, there is not enough information about this topic in the database",
+            "sources": []
+        },
+        {
+            "atomic": "The rising sea level of the Red Sea is due to climate change.",
+            "consensus": "not enough evidence",
+            "response": "The provided sources discuss sea level rise in general and its historical trends, but they do not specifically address the causes of rising sea levels in the Red Sea or link it directly to climate change. While there is evidence of global sea level rise and its acceleration [2], [3], [4], the claim lacks direct support regarding the specific impact of climate change on the Red Sea's sea level. Therefore, there is insufficient evidence to conclusively support the claim.",
+            "sources": [
+                {
+                    "article": "Sea level rise",
+                    "evidence": "Source 1:\nfor instance, mercer published a study in 1978 predicting that anthropogenic carbon dioxide warming and its potential effects on climate in the 21st century could cause a sea level rise of around 5 metres (16\u00a0ft) from melting of the west antarctic ice-sheet alone.\n"
+                },
+                {
+                    "article": "Global warming",
+                    "evidence": "Source 2:\nbetween 1993 and 2017, the global mean sea level rose on average by 3.1 \u00b1\u00a00.3\u00a0mm per year, with an acceleration detected as well.\n"
+                },
+                {
+                    "article": "Sea level rise",
+                    "evidence": "Source 3:\nbetween 1900 and 2016, the sea level rose by 16\u201321\u00a0cm (6.3\u20138.3\u00a0in).\n"
+                },
+                {
+                    "article": "Sea level",
+                    "evidence": "Source 4:\nfor at least the last 100 years, sea level has been rising at an average rate of about 1.8\u00a0mm (0.07\u00a0in) per year.\n"
+                },
+                {
+                    "article": "Global warming",
+                    "evidence": "Source 5:\nbetween 1993 and 2017, the global mean sea level rose on average by 3.1 \u00b1\u00a00.3\u00a0mm per year, with an acceleration detected as well.\n"
+                },
+                {
+                    "article": "Sea level rise",
+                    "evidence": "Source 6:\nbetween 1900 and 2016, the sea level rose by 16\u201321\u00a0cm (6.3\u20138.3\u00a0in).\n"
+                },
+                {
+                    "article": "Sea level rise",
+                    "evidence": "Source 7:\nsince at least the start of the 20th century, the average global sea level has been rising.\n"
+                }
+            ]
+        }
+    ]
+}
+
+

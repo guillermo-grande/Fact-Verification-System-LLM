@@ -1,8 +1,9 @@
-Determina si la siguiente claim es verdadera, falsa o inconclusiva. Escribe únicamente la palabra y una pequeña explicación:
+Determine if the following claim is true, false, inconclusive, or without evidence. Write only the word and a brief explanation. 
+Respond in the language of the claim:
 
-Claim: {original_claim}
+Claim: {query}
 
-Según las siguientes afirmaciones presentadas:
+According to the following statements:
 
 {atomics}
 

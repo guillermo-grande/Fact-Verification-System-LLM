@@ -1,0 +1,56 @@
+USER: Los osos polares se mueren por el cambio climático.
+
+AI:
+GENERAL [Verdadero|Falso]. Según las afirmaciones presentadas y las fuentes disponibles ...
+
+[atomic EXPLANATION]
+* The evidence clearly indicates that climate change is impacting polar bears. Source 1 states that sea ice shrinkage has led to higher mortality rates in polar bear cubs and changes in denning locations for pregnant females. Additionally, Source 2 explains that rising temperatures cause earlier sea ice melt, which affects the bears' ability to build fat reserves necessary for survival during food-scarce periods. These sources collectively support the claim that climate change affects polar bears
+* The evidence clearly indicates that climate change is impacting polar bears. Source 1 states that sea ice shrinkage has led to higher mortality rates in polar bear cubs and changes in denning locations for pregnant females. Additionally, Source 2 explains that rising temperatures cause earlier sea ice melt, which affects the bears' ability to build fat reserves necessary for survival during food-scarce periods. These sources collectively support the claim that climate change affects polar bears
+
+determina si verdadero o falso o inconclusivo.
+atomic (support | refute | not enough information | no evidence)
+atomic (support | refute | not enough information | no evidence)
+atomic (support | refute | not enough information | no evidence)
+
+
+CURRENT ATOMIC PARTS:
+
+CONCLUSION: "SUPPORT"  
+EXPLANATION: 
+The evidence clearly indicates that polar bears face significant threats due to climate change, leading to malnutrition
+and starvation from habitat loss [1]. Additionally, higher mortality rates in polar bear cubs have been linked to the 
+effects of sea ice shrinkage [2]. These factors collectively support the claim that polar bears die as a consequence 
+of these environmental changes.
+
+CONCLUSION: "SUPPORT"  
+EXPLANATION: The evidence clearly indicates that climate change is impacting polar bears. Source 1 states that sea ice
+shrinkage has led to higher mortality rates in polar bear cubs and changes in denning locations for pregnant females. 
+Additionally, Source 2 explains that rising temperatures cause earlier sea ice melt, which affects the bears' ability 
+to build fat reserves necessary for survival during food-scarce periods. These sources collectively support the claim 
+that climate change affects polar bears.
+
+
+IA:
+
+
+IA: **Verdadero**. The evidence clearly indicates that polar bears face significant threats due to climate change, leading to malnutrition
+and starvation from habitat loss [1]. Additionally, higher mortality rates in polar bear cubs have been linked to the 
+effects of sea ice shrinkage [2].
+
+<div id="response-div">
+    <p id="response-general">
+        {general}
+    </p>
+    <ul>
+
+        <li>{atomic.response}</li> for atomic in atomics if atomic.consensus != "no evidence"
+    </ul>
+</div>
+<div id="source">
+    <div class="hidden" id="1"> 
+        <div>
+            <span>Article:</span> {article} 
+        </div>
+        <div>{evidence}</div>
+    </div>
+</div>
