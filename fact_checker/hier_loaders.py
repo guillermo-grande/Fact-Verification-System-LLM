@@ -146,7 +146,7 @@ class EvidenceEnum(enum.IntEnum):
         label_map = {
             0: 'support', 
             1: 'refute', 
-            2: "no enough evidence", 
+            2: "not enough evidence", 
             3: "no evidence"
         }
         return label_map[int(self)]
@@ -156,7 +156,7 @@ class EvidenceEnum(enum.IntEnum):
         label_map = {
             'support': EvidenceEnum.SUPPORTS , 
             'refute' : EvidenceEnum.REFUTES, 
-            "no enough evidence": EvidenceEnum.NO_ENOUGH_EVIDENCE, 
+            "not enough evidence": EvidenceEnum.NO_ENOUGH_EVIDENCE, 
             "no evidence": EvidenceEnum.NO_EVIDENCE
         }
         return label_map[text.lower().strip()]

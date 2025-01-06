@@ -1,4 +1,4 @@
-Translate the following text to '{language}':
+Translate the following text from '{src_lang}' to '{dst_lang}':
 
 {text}
 

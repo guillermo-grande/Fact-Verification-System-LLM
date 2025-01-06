@@ -61,6 +61,10 @@ TRANSLATION_VERSION: int = 0
 TRANSLATION: str = load_prompt("translation", TRANSLATION_VERSION)
 PROMPT_TRANSLATION = PromptTemplate(TRANSLATION)
 
+#--------------------------------------------------------------------
+# Translation Models
+#--------------------------------------------------------------------
+# def load_translation_model()
 
 #--------------------------------------------------------------------
 # Translation
@@ -68,8 +72,9 @@ PROMPT_TRANSLATION = PromptTemplate(TRANSLATION)
 def translate_text(text: str, src_lang: str, dst_lang: str) -> str:
     if src_lang == dst_lang: return text
     
-    translation_prompt = TRANSLATION.format()
+    translation_prompt = PROMPT_TRANSLATION.format(text=text, src_lang=src_lang, dst_lang=dst_lang)
     translation_response = llm.complete(translation_prompt).text
+    return translation_response
 
 #--------------------------------------------------------------------
 # Verification Model
@@ -77,7 +82,7 @@ def translate_text(text: str, src_lang: str, dst_lang: str) -> str:
 conclusion_filter  = re.compile('CONCLUSION: "([\w\s\d]*)"\s*EXPLANATION:\s+((.|\n)*)')
 def verification_consensus(claim: str) -> tuple[EvidenceEnum, str]:
     """Calls an LLM model to determine the veracity of an atomic claim based on a list of evidence
-    notes. The model uses determine if the evidence supports or refutes the claim or if there is no
+    notes. The model uses determine if the evidence supports or refutes the claim or if there is not
     enough evidence to generate a conclusion.
 
     Args:
@@ -118,7 +123,7 @@ def verification_consensus(claim: str) -> tuple[EvidenceEnum, str]:
 #--------------------------------------------------------------------
 # Verification Pipeline
 #--------------------------------------------------------------------
-def verification_pipeline(user_query: str) -> str:
+def verification_pipeline(user_query: str) -> dict[str, any]:
     """
     Runs the full pipeline
 
@@ -126,19 +131,14 @@ def verification_pipeline(user_query: str) -> str:
     - query (str). User query with the original claims
     
     Returns:
-    - str. Text with full response.
+    - dict[str, any]. JSON response with all information.
     """
     # translate the query if it is not in English
     input_language = detect(user_query)
-    # if input_language != "en": 
-    #     query = translate_query(user_query, source_language=input_language, target_language="en")
-    # else:
-    #     query = user_query
-        
-    query = user_query
+    print("query language: ", input_language)
 
     # decompose into multiple atomic claims
-    atomic_claims = decompose_query(query)
+    atomic_claims = decompose_query(user_query)
 
     # get claims
     all_consensus = []
@@ -146,7 +146,7 @@ def verification_pipeline(user_query: str) -> str:
     consolidation_atomics = ""
     for claim_id, atomic in enumerate(atomic_claims):
         decision, _ = consensus = verification_consensus(atomic)
-        all_consensus.append((atomic, *consensus))
+        all_consensus.append([atomic, *consensus])
         evidence_found = evidence_found or decision != EvidenceEnum.NO_EVIDENCE
         # print(f"{claim_id:>2d} - validation: {str(decision)} - atomic: {atomic}")
 
@@ -154,21 +154,43 @@ def verification_pipeline(user_query: str) -> str:
         consolidation_atomics += consensus_atomic + "\n"
     
     if evidence_found:
-        consolidation_prompt = PROMPT_CONSOLIDATION.format(query=query, atomics=consolidation_atomics)
+        consolidation_prompt = PROMPT_CONSOLIDATION.format(query=user_query, atomics=consolidation_atomics)
         consolidation_response = llm.complete(consolidation_prompt).text
         verified = True
     else:
         consolidation_response = "No evidence. The database does not contain evidence to answer the claim."
         verified = False
     
+    print("\nTo translate:")
+    to_translate = str(consolidation_response) + '\n\n' + \
+        '\n\n'.join([
+            str(consensus[2]) + '\n\n' + str(consensus[0])
+            for consensus in all_consensus
+        ])
+    print("to translate text:")
+    print(to_translate)
+
+    translation = translate_text(to_translate, 'en', input_language)
+    print("\nTranslated text:")
+    print(translation)
+    translated_parts = translation.split('\n\n')
+    consolidation_response = translated_parts[0]
+    translated_parts       = translated_parts[1:]
+
+    print(f"nº of atomics: {len(all_consensus)}\tnº of translated text: {len(translated_parts)}")
+    for atomic_id in range(len(all_consensus)): 
+        all_consensus[atomic_id][0] = translated_parts[2 * atomic_id + 1]        
+        all_consensus[atomic_id][2].response = translated_parts[2 * atomic_id]
+
     ret =  {
-        'claim': query,
+        'claim': user_query,
         'verified': verified,
-        'general': consolidation_response,
-        'atomics': [
+        'language': input_language,
+        'general' : consolidation_response,
+        'atomics' : [
             {
                 'atomic'   : consensus[0], 
-                'consensus': str(consensus[1]),
+                'consensus': str(consensus[1]) , # support / refute / no evidence / no enough evidence 
                 'response' : str(consensus[2]) ,
                 'sources'  : [
                     {
@@ -182,30 +204,18 @@ def verification_pipeline(user_query: str) -> str:
         ]
     }    
 
-    
-
-
+    print(f"\nNew ret:\n{ret}")
     return ret
-
-# # Define a function for translation
-# def translate_text(text):
-#     # Translate the text using the pipeline
-#     translation = pipe(text)
-#     # The output is a list of dictionaries, so we extract the translated text
-#     return translation[0]['translation_text']
 
 if __name__ == "__main__":
     
     # Pregunta del usuario
     user_query = "Costs of burning fossil fuels are higher than the costs of renewable energy sources."
-    
-    #translated_text = translate_text(user_query)
-
-    #pprint(translated_text)
-
+    user_query = "El coste de quemar combustibles fósiles es mayor que el de las fuentes de energía renovable."
     
     # Consultar y generar respuesta
-    # try:
-    # documents = verification_pipeline(query)
-    # except Exception as e:
-    #     logger.error(f"Error al ejecutar la consulta: {e}")
+    try:
+        documents = verification_pipeline(user_query)
+        #print(documents)
+    except Exception as e:
+        logger.error(f"Error al ejecutar la consulta: {e}")

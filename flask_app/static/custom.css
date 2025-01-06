@@ -114,9 +114,12 @@ button.btn-primary {
     font-size: 24px; /* Adjust font size as needed */
     font-weight: 600;
 }
+
 .material-symbols-outlined::before {
     content: attr(data-icon);
+    margin-right: 0.25rem;
 }
+
 .material-symbols-outlined[data-icon="close"] {
     color: red;
     display: flex;
