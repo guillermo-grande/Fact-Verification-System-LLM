@@ -2,6 +2,11 @@ Determine, according to the given statements, if the following claim is true, fa
 Write only the word ("True", "False", "Inconclusive").
 Answer in English.
 
+Rules for decision-making:
+1. If there is a mix of true and false atomic statements, the claim is Inconclusive.
+2. If there is a mix of true and "no evidence" atomic statements, the claim should not automatically be Inconclusive. Decide based on the weight of the true statements relative to the claim.
+3. Similarly, if there is a mix of false and "no evidence" atomic statements, decide based on the weight of the false statements relative to the claim.
+
 Claim: {query}
 
 Statements:

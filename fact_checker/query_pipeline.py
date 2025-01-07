@@ -55,7 +55,7 @@ VERIFICATION_VERSION: int = 2
 ATOMIC_VERIFICATION: str = load_prompt("verification", VERIFICATION_VERSION)
 PROMPT_VERIFICATION = PromptTemplate(ATOMIC_VERIFICATION)
 
-CONSOLIDATION_VERSION: int = 2
+CONSOLIDATION_VERSION: int = 3
 CLAIM_CONSOLIDATION: str = load_prompt("consolidation", CONSOLIDATION_VERSION)
 PROMPT_CONSOLIDATION = PromptTemplate(CLAIM_CONSOLIDATION)
 
@@ -110,6 +110,8 @@ def verification_consensus(claim: str) -> tuple[EvidenceEnum, str]:
     # Query the citation engine
     response = citation_engine.query(claim)
 
+    #print(response)
+
     # process text
     if len(response.source_nodes) == 0: 
         # # TODO: no determine what to return
@@ -119,6 +121,9 @@ def verification_consensus(claim: str) -> tuple[EvidenceEnum, str]:
     claim_group = conclusion_filter.match(response.response)
     claim_check = claim_group.group(1)
     response.response = claim_group.group(2)
+    #print(claim_group)
+    #print(claim_check)
+    #print(response)
     return EvidenceEnum.from_str(claim_check), response
 
 #--------------------------------------------------------------------
@@ -128,14 +133,19 @@ def consolidate_results(results: list[EvidenceEnum], atomics: str, user_query: s
     n_support = sum(map(lambda s: s == EvidenceEnum.SUPPORTS, results))
     n_refutes = sum(map(lambda s: s == EvidenceEnum.REFUTES , results))
     
-    # cambie lo de arriba, para q podias hacerlo bien
     if len(results) == 0: return EvidenceEnum.NO_EVIDENCE, EvidenceEnum.NO_EVIDENCE.result().capitalize()
     elif n_support == len(results): return EvidenceEnum.SUPPORTS, EvidenceEnum.SUPPORTS.result().capitalize()
     elif n_refutes == len(results): return EvidenceEnum.REFUTES, EvidenceEnum.REFUTES.result().capitalize()
     else:
         consolidation_prompt = PROMPT_CONSOLIDATION.format(query=user_query, atomics=atomics)
         consolidation_response = llm.complete(consolidation_prompt).text
-        return consolidation_response.lower(), consolidation_response
+        if consolidation_response.lower() == "true":
+            consolidation_response_eval = EvidenceEnum.SUPPORTS
+        elif consolidation_response.lower() == "false":
+            consolidation_response_eval = EvidenceEnum.REFUTES
+        elif consolidation_response.lower() == "inconclusive":
+            consolidation_response_eval = EvidenceEnum.NO_ENOUGH_EVIDENCE
+        return consolidation_response_eval, consolidation_response
 
 
 #--------------------------------------------------------------------
@@ -155,24 +165,36 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
     input_language = detect(user_query)
     # print(input_language)
 
-    # decompose into multiple atomic claims
-    atomic_claims = decompose_query(user_query)
-
     # get claims
     all_consensus = []
     evidence_found = False
 
     all_results = []
     consolidation_atomics = ""
-    for claim_id, atomic in enumerate(atomic_claims):
-        decision, _ = consensus = verification_consensus(atomic)
-        all_consensus.append([atomic, *consensus])
-        all_results.append(decision)
-        evidence_found = evidence_found or decision != EvidenceEnum.NO_EVIDENCE
-        # print(f"{claim_id:>2d} - validation: {str(decision)} - atomic: {atomic}")
 
-        consensus_atomic = f"atomic: {atomic}\nvalidation: {str(decision)}"
-        consolidation_atomics += consensus_atomic + "\n"
+    decision, _ = consensus = verification_consensus(user_query)
+    all_consensus.append([user_query, *consensus])
+    all_results.append(decision)
+    evidence_found = evidence_found or decision != EvidenceEnum.NO_EVIDENCE
+
+    consensus_atomic = f"atomic: {user_query}\nvalidation: {str(decision)}"
+    consolidation_atomics += consensus_atomic + "\n"
+
+    if(not evidence_found):
+        all_consensus = []
+        all_results = []
+        consolidation_atomics = ""
+        # decompose into multiple atomic claims
+        atomic_claims = decompose_query(user_query)
+        for claim_id, atomic in enumerate(atomic_claims):
+            decision, _ = consensus = verification_consensus(atomic)
+            all_consensus.append([atomic, *consensus])
+            all_results.append(decision)
+            evidence_found = evidence_found or decision != EvidenceEnum.NO_EVIDENCE
+            # print(f"{claim_id:>2d} - validation: {str(decision)} - atomic: {atomic}")
+
+            consensus_atomic = f"atomic: {atomic}\nvalidation: {str(decision)}"
+            consolidation_atomics += consensus_atomic + "\n"
     
     if evidence_found:
         # consolidation_prompt = PROMPT_CONSOLIDATION.format(query=user_query, atomics=consolidation_atomics)
@@ -184,6 +206,8 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
         consolidation_response = "No evidence. The database does not contain evidence to answer the claim."
         verified = False
     
+    # print(consolidatidated)
+
     to_translate = str(consolidation_response) + '\n\nSee sources\n\n' + \
         '\n\n'.join([
             str(consensus[2]) + '\n\n' + str(consensus[0])
@@ -223,6 +247,7 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
             for consensus in all_consensus
         ]
     }    
+    # print(ret)
 
     return ret
 

@@ -295,7 +295,8 @@ class EvidenceClaimRetriever(BaseRetriever):
                 MetadataFilter(key="claim_id", operator = FilterOperator.IN, value = claim_ids)
             ]
         )
-    
+        # Claim -> claims (0.5)
+        # Evidence 
         # Initialize the evidence retriever with the filter
         # this is required to set each time the filters as they cann't be set at query time.
         evidence_retriever = self.evidence_index.as_retriever(
