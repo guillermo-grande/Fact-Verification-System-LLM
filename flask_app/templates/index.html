@@ -25,9 +25,9 @@
         </div>
 
         <!-- Main Chat Section -->
-        <div class="row flex-grow-1">
+        <div class="row flex-grow-1 h-100">
             <div class="col d-flex justify-content-center align-items-center">
-                <div class="card shadow-lg w-80 d-flex justify-content-center align-items-center" style="height: 90%; width: 80vw">
+                <div class="card shadow-lg w-80 d-flex justify-content-center align-items-center" style="height: 75vh; width: 80vw">
                     <!-- Chat Header -->
                     <div class="card-header custom-chat-header text-white text-center w-100">
                         <h2>Ask me anything about Climate Change</h2>
@@ -43,7 +43,7 @@
                     <!-- Chat Input -->
                     <div class="card-footer bg-light w-100">
                         <form id="chat-form" class="d-flex" autocomplete="off">
-                            <input type="text" id="message-input" class="form-control me-2" name="message" placeholder="Type your message..." required>
+                            <input  type="text" id="message-input" class="form-control me-2" name="message" placeholder="Type your message..." required>
                             <button type="button" id="send-button" class="btn btn-primary">Send</button>
                         </form>
                     </div>
@@ -92,6 +92,7 @@
             userMessage.classList.add('chat-msg');
             //userMessage.style.marginRight = '100px';
             chatBox.appendChild(userMessage);
+            messageInput.disabled = true;
 
             // Scroll to the bottom of the chat box
             chatBox.scrollTop = chatBox.scrollHeight;
@@ -121,6 +122,7 @@
                     console.error('Error:', error);
                 });
         }
+        messageInput.disabled = false;
     });
 
 </script>

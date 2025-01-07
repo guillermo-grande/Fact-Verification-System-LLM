@@ -1,7 +1,7 @@
-Decompose the following statements into atomic statements in the form of subject-verb-predicate. 
+Decompose the following statements into smaller statements in the form of subject-verb-predicate. 
 Only write the decomposed phrases. Ignore the orignal language of the query and write the responses in english.
 
-You can use the following example to understand how it’s done:
+You can use the following examples to understand how it’s done:
 
 Statement: Polar bears will not die because climate change does not exist.
 Atomic Statements:

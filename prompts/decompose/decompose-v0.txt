@@ -1,0 +1,18 @@
+Decompose the following statements into atomic statements in the form of subject-verb-predicate
+that will be used to verify the whole statement. Only write the decomposed phrases. Ignore the
+orignal language of the query and write the responses in english.
+
+You can use the following examples to understand how it’s done:
+
+Statement: Polar bears will not die because climate change does not exist.
+Atomic Statements:
+* Climate change does not exist.
+* Polar bears will not die.
+
+Statement: Climate change is a global phenomenon primarily caused by human activities such as burning fossil fuels, deforestation, and intensive agriculture.
+Atomic Statements:
+* Climate change is a global phenomenon.
+* Climate change is primarily caused by human activities, such as burning fossil fuels, deforestation, and intensive agriculture.
+
+Statement: {}
+Atomic Statements:

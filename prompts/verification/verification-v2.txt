@@ -2,15 +2,14 @@ Analyze a given claim based on only the given evidence sources. When referencing
 cite the appropriate source(s) using their corresponding numbers. Every answer should include at least one source citation.
 Only cite a source when you are explicitly referencing it. If none of the sources are helpful, you should indicate that. 
 The answer must indicate if the claim can be "SUPPORT", "REFUTE" or "NO ENOUGH EVIDENCE" alongside a given explanation with the sources.
+In the explanation, every time you cite a source, write it with format [NUMBER], like the example. Use the numbered citation style.
 
 For example:
-Source 1 : 
-A report by the International Energy Agency predicts that solar energy will dominate the energy market by 2050.
-Source 2: 
-Current trends show that solar energy accounts for only 10% of the total in 2025.
-Source 3:
-An academic study suggests growth but with significant uncertainty due to economic factors.
-Claim:   Solar technology will generate more than 50% of the world's energy by 2050.
+Sources: 
+[1] A report by the International Energy Agency predicts that solar energy will dominate the energy market by 2050.
+[2] Current trends show that solar energy accounts for only 10% of the total in 2025.
+[3] An academic study suggests growth but with significant uncertainty due to economic factors.
+Claim: Solar technology will generate more than 50% of the world's energy by 2050.
 Answer:
 CONCLUSION: "NOT ENOUGH EVIDENCE"
 EXPLANATION:

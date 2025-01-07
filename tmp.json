@@ -1,85 +1,28 @@
 {
-    "claim": "Los osos polares se mueren por el cambio clim\u00e1tico.",
-    "verified": true,
-    "general": "Inconcluso. Aunque el cambio clim\u00e1tico afecta a los osos polares, no hay evidencia directa en las declaraciones proporcionadas que vincule espec\u00edficamente la muerte de los osos polares con el cambio clim\u00e1tico.",
-    "atomics": [
+  "claim": "El coste de quemar combustibles f\u00f3siles es mayor que el de las fuentes de energ\u00eda renovable.",
+  "verified": true,
+  "see-sources": "Ver fuentes",
+  "language": "es",
+  "general": "Inconcluso",
+  "atomics": [
+    {
+      "atomic": "El costo de quemar combustibles f\u00f3siles es mayor que el costo de las fuentes de energ\u00eda renovable.",
+      "consensus": "not enough evidence",
+      "response": "La evidencia proporcionada indica que los precios de los combustibles f\u00f3siles est\u00e1n generalmente por debajo de sus costos reales al considerar externalidades econ\u00f3micas como la contaminaci\u00f3n del aire y la destrucci\u00f3n del clima [1][2]. Sin embargo, no compara directamente los costos de quemar combustibles f\u00f3siles con los costos de las fuentes de energ\u00eda renovable. Si bien sugiere que las fuentes de energ\u00eda renovable pueden volverse econ\u00f3micamente viables en un futuro cercano [3], no confirma que el costo actual de quemar combustibles f\u00f3siles sea mayor que el de la energ\u00eda renovable. Por lo tanto, hay evidencia insuficiente para apoyar o refutar la afirmaci\u00f3n.",
+      "sources": [
         {
-            "atomic": "The ozone layer is open over the Red Sea.",
-            "consensus": "no evidence",
-            "response": "Sorry, there is not enough information about this topic in the database",
-            "sources": []
+          "article": "Fossil fuel",
+          "evidence": "[1] fossil fuel prices generally are below their actual costs, or their efficient prices, when economic externalities, such as the costs of air pollution and global climate destruction, are taken into account.\n"
         },
         {
-            "atomic": "The rising sea level of the Red Sea is due to climate change.",
-            "consensus": "not enough evidence",
-            "response": "The provided sources discuss sea level rise in general and its historical trends, but they do not specifically address the causes of rising sea levels in the Red Sea or link it directly to climate change. While there is evidence of global sea level rise and its acceleration [2], [7], [3], the claim lacks direct support regarding the specific impact of climate change on the Red Sea's sea level. Therefore, there is insufficient evidence to conclusively support the claim.",
-            "sources": [
-                {
-                    "article": "Sea level rise",
-                    "evidence": "Source 1:\nfor instance, mercer published a study in 1978 predicting that anthropogenic carbon dioxide warming and its potential effects on climate in the 21st century could cause a sea level rise of around 5 metres (16\u00a0ft) from melting of the west antarctic ice-sheet alone.\n"
-                },
-                {
-                    "article": "Global warming",
-                    "evidence": "Source 2:\nbetween 1993 and 2017, the global mean sea level rose on average by 3.1 \u00b1\u00a00.3\u00a0mm per year, with an acceleration detected as well.\n"
-                },
-                {
-                    "article": "Sea level rise",
-                    "evidence": "Source 3:\nbetween 1900 and 2016, the sea level rose by 16\u201321\u00a0cm (6.3\u20138.3\u00a0in).\n"
-                },
-                {
-                    "article": "Sea level",
-                    "evidence": "Source 4:\nfor at least the last 100 years, sea level has been rising at an average rate of about 1.8\u00a0mm (0.07\u00a0in) per year.\n"
-                },
-                {
-                    "article": "Global warming",
-                    "evidence": "Source 5:\nbetween 1993 and 2017, the global mean sea level rose on average by 3.1 \u00b1\u00a00.3\u00a0mm per year, with an acceleration detected as well.\n"
-                },
-                {
-                    "article": "Sea level rise",
-                    "evidence": "Source 6:\nbetween 1900 and 2016, the sea level rose by 16\u201321\u00a0cm (6.3\u20138.3\u00a0in).\n"
-                },
-                {
-                    "article": "Sea level rise",
-                    "evidence": "Source 7:\nsince at least the start of the 20th century, the average global sea level has been rising.\n"
-                }
-            ]
+          "article": "Fossil fuel",
+          "evidence": "[2] fossil fuel prices generally are below their actual costs, or their efficient prices, when economic externalities, such as the costs of air pollution and global climate destruction, are taken into account.\n"
         },
         {
-            "atomic": "The rising sea level of the Red Sea is due to climate change.",
-            "consensus": "not enough evidence",
-            "response": "The provided sources discuss sea level rise in general and its historical trends, but they do not specifically address the causes of rising sea levels in the Red Sea or link it directly to climate change. While there is evidence of global sea level rise and its acceleration [2], [3], [4], the claim lacks direct support regarding the specific impact of climate change on the Red Sea's sea level. Therefore, there is insufficient evidence to conclusively support the claim.",
-            "sources": [
-                {
-                    "article": "Sea level rise",
-                    "evidence": "Source 1:\nfor instance, mercer published a study in 1978 predicting that anthropogenic carbon dioxide warming and its potential effects on climate in the 21st century could cause a sea level rise of around 5 metres (16\u00a0ft) from melting of the west antarctic ice-sheet alone.\n"
-                },
-                {
-                    "article": "Global warming",
-                    "evidence": "Source 2:\nbetween 1993 and 2017, the global mean sea level rose on average by 3.1 \u00b1\u00a00.3\u00a0mm per year, with an acceleration detected as well.\n"
-                },
-                {
-                    "article": "Sea level rise",
-                    "evidence": "Source 3:\nbetween 1900 and 2016, the sea level rose by 16\u201321\u00a0cm (6.3\u20138.3\u00a0in).\n"
-                },
-                {
-                    "article": "Sea level",
-                    "evidence": "Source 4:\nfor at least the last 100 years, sea level has been rising at an average rate of about 1.8\u00a0mm (0.07\u00a0in) per year.\n"
-                },
-                {
-                    "article": "Global warming",
-                    "evidence": "Source 5:\nbetween 1993 and 2017, the global mean sea level rose on average by 3.1 \u00b1\u00a00.3\u00a0mm per year, with an acceleration detected as well.\n"
-                },
-                {
-                    "article": "Sea level rise",
-                    "evidence": "Source 6:\nbetween 1900 and 2016, the sea level rose by 16\u201321\u00a0cm (6.3\u20138.3\u00a0in).\n"
-                },
-                {
-                    "article": "Sea level rise",
-                    "evidence": "Source 7:\nsince at least the start of the 20th century, the average global sea level has been rising.\n"
-                }
-            ]
+          "article": "Fossil fuel",
+          "evidence": "[3] artificial gasolines and other renewable energy sources currently require more expensive production and processing technologies than conventional petroleum reserves, but may become economically viable in the near future.\n"
         }
-    ]
+      ]
+    }
+  ]
 }
-
-

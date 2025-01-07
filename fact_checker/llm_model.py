@@ -35,6 +35,6 @@ if not LLAMA_AVAILABLE:
         logger.critical("La API key de OpenAI no se encontró en el archivo .env.")
         raise ValueError("Falta la API key de OpenAI en el archivo .env.")
 
-    llm = OpenAI(model = "gpt-4o-mini", temperature=0.1, max_tokens=200)
+    llm = OpenAI(model = "gpt-4o-mini", temperature=0.1, max_tokens=None)
 else:
     llm = Ollama("llama2:latest", "http://kumo01:11434", temperature=0.1, request_timeout=120.0)

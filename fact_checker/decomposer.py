@@ -2,7 +2,7 @@
 from fact_checker.llm_model import llm, LLAMA_AVAILABLE
 from fact_checker.utils import load_prompt
 
-PROMPT_VERSION: int = 1
+PROMPT_VERSION: int = 2
 DECOMPOSE_PROMPT = load_prompt("decompose", PROMPT_VERSION)
 
 if LLAMA_AVAILABLE: 

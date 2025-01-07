@@ -35,6 +35,7 @@ logger.setLevel(logging.DEBUG)
 # Embedding Model
 #----------------------------------------------------------------------------------------
 
+# embed_model_id = "sentence-transformers/msmarco-MiniLM-L-12-v3"
 embed_model_id = "sentence-transformers/all-MiniLM-L6-v2"
 embed_model = HuggingFaceEmbedding(model_name=embed_model_id)
 logger.debug(f"loaded embedding model: {embed_model_id}")
@@ -160,6 +161,18 @@ class EvidenceEnum(enum.IntEnum):
             "no evidence": EvidenceEnum.NO_EVIDENCE
         }
         return label_map[text.lower().strip()]
+
+    def result(self) -> str:
+        label_map = {
+            0: 'True', 
+            1: 'False', 
+            2: "Inconclusive", 
+            3: "No evidence"
+        }
+        return label_map[int(self)]
+
+
+
 
 
 #----------------------------------------------------------------------------------------

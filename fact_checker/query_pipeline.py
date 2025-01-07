@@ -18,6 +18,7 @@ logger = configure_logger(logger, 'INFO')
 from fact_checker.llm_model    import llm, LLAMA_AVAILABLE
 from fact_checker.utils        import load_prompt
 from fact_checker.hier_loaders import EvidenceClaimRetriever, EvidenceEnum
+from fact_checker.custom_citation import CustomCitationQueryEngine
 
 from fact_checker.decomposer   import decompose_query
 
@@ -26,6 +27,7 @@ from llama_index.core.schema import NodeWithScore
 from llama_index.core.prompts import PromptTemplate
 from llama_index.core.query_engine import CitationQueryEngine
 from llama_index.core.response_synthesizers import BaseSynthesizer, ResponseMode, get_response_synthesizer
+
 
 import re
 
@@ -92,7 +94,6 @@ def verification_consensus(claim: str) -> tuple[EvidenceEnum, str]:
         EvidenceEnum: integer value of the conclusion. It has the same map as the evidence label.
         str: full message of the LLM response. This can be used to report to the user why it obtained the results.
     """
-    # TODO
     # my recommendation is to use QueryEngine so it returns the text with the citations.
     # https://docs.llamaindex.ai/en/stable/examples/workflow/citation_query_engine/
     # https://docs.llamaindex.ai/en/stable/examples/query_engine/citation_query_engine/
@@ -104,7 +105,7 @@ def verification_consensus(claim: str) -> tuple[EvidenceEnum, str]:
         text_qa_template = PROMPT_VERIFICATION, 
         response_mode = ResponseMode.COMPACT,
     )
-    citation_engine = CitationQueryEngine(retrieve_engine, llm = llm, response_synthesizer=response_synthetizer)
+    citation_engine = CustomCitationQueryEngine(retrieve_engine, llm = llm, response_synthesizer=response_synthetizer)
 
     # Query the citation engine
     response = citation_engine.query(claim)
@@ -121,6 +122,23 @@ def verification_consensus(claim: str) -> tuple[EvidenceEnum, str]:
     return EvidenceEnum.from_str(claim_check), response
 
 #--------------------------------------------------------------------
+# Results Consolidation
+#--------------------------------------------------------------------
+def consolidate_results(results: list[EvidenceEnum], atomics: str, user_query: str) -> tuple[EvidenceEnum, str]:
+    n_support = sum(map(lambda s: s == EvidenceEnum.SUPPORTS, results))
+    n_refutes = sum(map(lambda s: s == EvidenceEnum.REFUTES , results))
+    
+    # cambie lo de arriba, para q podias hacerlo bien
+    if len(results) == 0: return EvidenceEnum.NO_EVIDENCE, EvidenceEnum.NO_EVIDENCE.result().capitalize()
+    elif n_support == len(results): return EvidenceEnum.SUPPORTS, EvidenceEnum.SUPPORTS.result().capitalize()
+    elif n_refutes == len(results): return EvidenceEnum.REFUTES, EvidenceEnum.REFUTES.result().capitalize()
+    else:
+        consolidation_prompt = PROMPT_CONSOLIDATION.format(query=user_query, atomics=atomics)
+        consolidation_response = llm.complete(consolidation_prompt).text
+        return consolidation_response.lower(), consolidation_response
+
+
+#--------------------------------------------------------------------
 # Verification Pipeline
 #--------------------------------------------------------------------
 def verification_pipeline(user_query: str) -> dict[str, any]:
@@ -135,7 +153,7 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
     """
     # translate the query if it is not in English
     input_language = detect(user_query)
-    print("query language: ", input_language)
+    # print(input_language)
 
     # decompose into multiple atomic claims
     atomic_claims = decompose_query(user_query)
@@ -143,10 +161,13 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
     # get claims
     all_consensus = []
     evidence_found = False
+
+    all_results = []
     consolidation_atomics = ""
     for claim_id, atomic in enumerate(atomic_claims):
         decision, _ = consensus = verification_consensus(atomic)
         all_consensus.append([atomic, *consensus])
+        all_results.append(decision)
         evidence_found = evidence_found or decision != EvidenceEnum.NO_EVIDENCE
         # print(f"{claim_id:>2d} - validation: {str(decision)} - atomic: {atomic}")
 
@@ -154,30 +175,27 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
         consolidation_atomics += consensus_atomic + "\n"
     
     if evidence_found:
-        consolidation_prompt = PROMPT_CONSOLIDATION.format(query=user_query, atomics=consolidation_atomics)
-        consolidation_response = llm.complete(consolidation_prompt).text
+        # consolidation_prompt = PROMPT_CONSOLIDATION.format(query=user_query, atomics=consolidation_atomics)
+        # consolidation_response = llm.complete(consolidation_prompt).text
+        consolidatidated, consolidation_response = consolidate_results(all_results, consolidation_atomics, user_query)
         verified = True
     else:
+        consolidatidated = EvidenceEnum.NO_EVIDENCE
         consolidation_response = "No evidence. The database does not contain evidence to answer the claim."
         verified = False
     
-    print("\nTo translate:")
-    to_translate = str(consolidation_response) + '\n\n' + \
+    to_translate = str(consolidation_response) + '\n\nSee sources\n\n' + \
         '\n\n'.join([
             str(consensus[2]) + '\n\n' + str(consensus[0])
             for consensus in all_consensus
         ])
-    print("to translate text:")
-    print(to_translate)
 
     translation = translate_text(to_translate, 'en', input_language)
-    print("\nTranslated text:")
-    print(translation)
     translated_parts = translation.split('\n\n')
     consolidation_response = translated_parts[0]
-    translated_parts       = translated_parts[1:]
+    see_sources            = translated_parts[1]
+    translated_parts       = translated_parts[2:]
 
-    print(f"nº of atomics: {len(all_consensus)}\tnº of translated text: {len(translated_parts)}")
     for atomic_id in range(len(all_consensus)): 
         all_consensus[atomic_id][0] = translated_parts[2 * atomic_id + 1]        
         all_consensus[atomic_id][2].response = translated_parts[2 * atomic_id]
@@ -185,6 +203,8 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
     ret =  {
         'claim': user_query,
         'verified': verified,
+        'result': str(consolidatidated),
+        'see-sources': see_sources,
         'language': input_language,
         'general' : consolidation_response,
         'atomics' : [
@@ -204,7 +224,6 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
         ]
     }    
 
-    print(f"\nNew ret:\n{ret}")
     return ret
 
 if __name__ == "__main__":

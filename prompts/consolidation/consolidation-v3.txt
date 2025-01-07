@@ -1,0 +1,10 @@
+Determine, according to the given statements, if the following claim is true, false or inconclusive.
+Write only the word ("True", "False", "Inconclusive").
+Answer in English.
+
+Claim: {query}
+
+Statements:
+{atomics}
+
+Answer:
