@@ -1,22 +1,22 @@
 claim, claim_label, original_claim_id, original_claim
 "Climate change is pushing polar bears closer to extinction","support",0,"Global warming is driving polar bears toward extinction"
 "The sun has entered a ‘minimum activity phase,’ potentially causing colder climates, seismic activity, and food shortages, according to researchers","support",5,"The sun has gone into ‘lockdown’ which could cause freezing weather, earthquakes and famine, say scientists"
-"Experts claim we are the primary drivers of global temperature changes due to burning fossil fuels and emitting carbon dioxide","support",11
-"The Great Barrier Reef is undergoing the most extensive coral bleaching ever documented","support",14
-"Volcanic activity is melting West Antarctic glaciers rather than climate change","support",28
-"The identification of significant volcanic CO2 emissions undermines the global warming hypothesis","support"
-"Over 500 scientists and climate-related professionals have submitted a 'European Climate Declaration' to the United Nations Secretary-General","support"
-"Earth’s average temperature over the past 2,000 years reveals two warmer periods: the Roman Warm Period (1–200 A.D.) and the Medieval Warm Period (900–1100 A.D.)","support"
-"Frigid conditions are expected globally as the solar minimum intensifies, according to NASA","support"
-"Climate models have overestimated warming by nearly threefold since 1988","support"
-"The polar bear population is increasing.","refute",6
-"A surprising study indicates that higher CO2 levels have marginally cooled the planet","refute"
-"Human contributions of CO2 fall within the margin of error in current data, with most CO2 increases coming from ocean outgassing as the planet gradually recovers from the last ice age.","refute"
-"If CO2 were catastrophic for the environment, using a CO2 generator in a greenhouse would harm plants, which it does not.","refute"
-"The rate of sea-level rise has been gradual and consistent, predating industrial activities","refute"
+"Experts claim we are the primary drivers of global temperature changes due to burning fossil fuels and emitting carbon dioxide","support",11,
+"The Great Barrier Reef is undergoing the most extensive coral bleaching ever documented","support",14,
+"Volcanic activity is melting West Antarctic glaciers rather than climate change","support",28,
+"The identification of significant volcanic CO2 emissions undermines the global warming hypothesis","support", ,
+"Over 500 scientists and climate-related professionals have submitted a 'European Climate Declaration' to the United Nations Secretary-General","support", ,
+"Earth’s average temperature over the past 2,000 years reveals two warmer periods: the Roman Warm Period (1–200 A.D.) and the Medieval Warm Period (900–1100 A.D.)","support", ,
+"Frigid conditions are expected globally as the solar minimum intensifies, according to NASA","support", ,
+"Climate models have overestimated warming by nearly threefold since 1988","support", ,
+"The polar bear population is increasing.","refute",6,
+"A surprising study indicates that higher CO2 levels have marginally cooled the planet","refute", ,
+"Human contributions of CO2 fall within the margin of error in current data, with most CO2 increases coming from ocean outgassing as the planet gradually recovers from the last ice age.","refute", ,
+"If CO2 were catastrophic for the environment, using a CO2 generator in a greenhouse would harm plants, which it does not.","refute", ,
+"The rate of sea-level rise has been gradual and consistent, predating industrial activities","refute", ,
 "When an iceberg melts, ocean levels remain unchanged.","refute", ,
-"There is no conclusive experimental proof that greenhouse gases directly cause temperature increases.","refute", ,"There isn’t yet any empirical evidence for their claim that greenhouse gases even cause temperatures to increase."
-"Carbon dioxide remains in the atmosphere for roughly five years","refute", ,"The ­atmospheric residency time of carbon dioxide is five years"
-"Sea-level rise is not accelerating.","refute", ,"sea-level rise is not accelerating."
-"Global temperatures are not increasing as rapidly as predicted by alarmist computer simulations.","refute", ,"The temperature is not rising nearly as fast as the alarmist computer models predicted."
+"There is no conclusive experimental proof that greenhouse gases directly cause temperature increases.","refute",86,"There isn’t yet any empirical evidence for their claim that greenhouse gases even cause temperatures to increase."
+"Carbon dioxide remains in the atmosphere for roughly five years","refute",82,"The ­atmospheric residency time of carbon dioxide is five years"
+"Sea-level rise is not accelerating.","refute",108,"sea-level rise is not accelerating."
+"Global temperatures are not increasing as rapidly as predicted by alarmist computer simulations.","refute",113,"The temperature is not rising nearly as fast as the alarmist computer models predicted."
 

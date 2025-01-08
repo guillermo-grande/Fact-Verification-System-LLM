@@ -1,4 +1,4 @@
-
+import time
 import tqdm
 import pandas as pd
 from sklearn.metrics import classification_report
@@ -8,7 +8,6 @@ import statistics
 from bert_score import score
 
 import sys
-# caution: path[0] is reserved for script path (or '' in REPL)
 sys.path.insert(1, './')
 
 from fact_checker.hier_loaders import EvidenceClaimRetriever
@@ -22,7 +21,19 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipe
 
 EVALUATION_VERSION: int = 0
 RETRIEVER_EVALUATION_VERSION: int = 1
-BERT_EVALUATION_VERSION: int =0
+BERT_EVALUATION_VERSION: int = 0
+FACTSCORE_EVALUATION_VERSION: int = 0
+TIME_EVALUATION_VERSION: int = 1
+
+# ------------------------------------------------------------------------------
+# Carga de modelos
+# ------------------------------------------------------------------------------
+
+model_name = "facebook/bart-large-mnli"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSequenceClassification.from_pretrained(model_name)
+
+nli_pipeline = pipeline("text-classification", model=model, tokenizer=tokenizer)
 
 # ------------------------------------------------------------------------------
 # Data Loading
@@ -33,7 +44,7 @@ evidence['claim_id'] = evidence['claim_id'].astype(int)
 # ------------------------------------------------------------------------------
 # Método 1: Evaluación de respuestas de la pipeline (lee dataset, llama al pipeline y guarda resultados)
 # ------------------------------------------------------------------------------
-def evaluate_verification_pipeline(evaluation_version: int = 0) -> None:
+def evaluate_verification_pipeline() -> None:
     """
     Lee un dataset CSV que contiene claims y sus etiquetas ('label'),
     pasa cada claim por la 'verification_pipeline', guarda la respuesta en la columna 'response'
@@ -45,11 +56,11 @@ def evaluate_verification_pipeline(evaluation_version: int = 0) -> None:
     """
 
     # 1. Leer dataset
-    df = pd.read_csv(f"evaluation-dataset-v{evaluation_version}.csv")
+    df = pd.read_csv(f"evaluation/evaluation-dataset-v{EVALUATION_VERSION}.csv")
     df['label'] = df['label'].str.strip()  # Asegurar que la columna 'label' no tenga espacios extra
     df['response'] = ""  # Inicializa la columna de respuesta en blanco
 
-    print(f"Ejemplo de claim:\n{df['claim'][0]}\n")
+    #print(f"Ejemplo de claim:\n{df['claim'][0]}\n")
 
     # 2. Proceso de verificación claim por claim
     for i, row in tqdm.tqdm(df.iterrows(), desc="Proceso Evaluación: ", total=df.shape[0]):
@@ -69,14 +80,27 @@ def evaluate_verification_pipeline(evaluation_version: int = 0) -> None:
     # 3. Informe y guardado de resultados
     print("\n=== Classification Report ===")
     print(classification_report(df['response'], df['label']))
-    df.to_csv(f"evaluated-dataset-v{evaluation_version}.csv", index=False)
+    df.to_csv(f"evaluation/evaluated-dataset-v{EVALUATION_VERSION}.csv", index=False)
+
+""" RESULTS """
+
+""" Prueba Final - Dataset v0
+=== Classification Report ===
+              precision    recall  f1-score   support
+
+       other       0.96      0.75      0.84        32
+      refute       0.80      0.95      0.87        21
+     support       0.88      1.00      0.94        22
+
+    accuracy                           0.88        75
+   macro avg       0.88      0.90      0.88        75
+weighted avg       0.89      0.88      0.88        75
+"""
 
 # ------------------------------------------------------------------------------
 # Método 2: Evaluación del retriever (cálculo de Recall@K y MRR)
 # ------------------------------------------------------------------------------
 def evaluate_retriever(
-    retriever,
-    paraphrased_claims_dataset: List[Dict],
     k: int = 5
 ):
     """
@@ -112,7 +136,7 @@ def evaluate_retriever(
     
     retriever = EvidenceClaimRetriever(claim_top=3, evidence_top=5)
 
-    for claim_data in tqdm.tqdm(paraphrased_claims_dataset, desc="Proceso Evaluación Retriever: ", total=len(paraphrased_claims_dataset)):
+    for claim_data in tqdm.tqdm(claims_dataset, desc="Proceso Evaluación Retriever: ", total=len(claims_dataset)):
         print(claim_data)
         # 1. Texto reformulado que sirve como query
         query_text = claim_data["claim_reformulated"]
@@ -244,56 +268,57 @@ def evaluate_factscore() -> List[float]:
     
     dataset = pd.read_csv(f"./evaluation/evaluation-bert-v{BERT_EVALUATION_VERSION}.csv")
 
-    model_name = "facebook/bart-large-mnli"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSequenceClassification.from_pretrained(model_name)
-
-    nli_pipeline = pipeline("text-classification", model=model, tokenizer=tokenizer)
-
     all_factscores = []
 
-    # Recorre cada fila del dataset
     for i, row in tqdm.tqdm(dataset.iterrows(), desc="Proceso Evaluación: ", total=dataset.shape[0]):
         claim_text = row["claim"]
 
-        # 1) Obtenemos la respuesta del pipeline
         response = verification_pipeline(claim_text)
 
         if not response['verified']:
             continue
 
-        # 2) Extraemos los textos generados en cada atomic
-        generated_texts = [atomic['response'] for atomic in response['atomics'] if len(atomic['sources'])>0]
+        atomic_claims = [atomic['atomic'] for atomic in response['atomics'] if len(atomic['sources'])>0]
 
-        # 3) Construimos la lista de referencias para cada atomic
-        #    Se usa el split(']', 2)[1] para quitar el prefijo "[n]" de la evidencia
+        atomic_consensus = [atomic['consensus'] for atomic in response['atomics'] if len(atomic['sources'])>0]
+
+        for atomic in response['atomics']:
+            for source in atomic['sources']:
+                aux = source['evidence'].split(']')
+                aux.pop(0)
+                source['evidence'] = "".join(x for x in aux)
         reference_texts_list = [
             [
-                source['evidence'].split(']', 2)[1] 
+                source['evidence']
                 for source in atomic['sources']
             ]
             for atomic in response['atomics']
             if len(atomic['sources'])>0
         ]
 
-        # 4) Calculamos FactScore para cada atomic y promediamos
         atomic_scores = []
-        for gen_text, ref_texts in zip(generated_texts, reference_texts_list):
-            fs = compute_factscore(nli_pipeline, gen_text, ref_texts)
+        for gen_text, consensus, ref_texts in zip(atomic_claims, atomic_consensus, reference_texts_list):
+            if consensus == "support":
+                consensus = 0
+            elif consensus == "refute":
+                consensus = 1
+            else:
+                consensus = 2
+            fs = compute_factscore(gen_text, consensus, ref_texts)
+            print(fs)
             atomic_scores.append(fs)
-        print(atomic_scores)
         if atomic_scores:
             avg_factscore = statistics.mean(atomic_scores)
         else:
-            # Si no hubiera atomics, evitamos error de mean()
             avg_factscore = 0.0
 
         all_factscores.append(avg_factscore)
 
-    # Retornamos la lista de FactScores, uno por cada claim
+    print("Factscore promedio: ",statistics.mean(all_factscores))
+
     return all_factscores
 
-def compute_factscore(nli_pipeline, generated_text: str, evidence_texts: list) -> float:
+def compute_factscore(generated_text: str, consensus: int, evidence_texts: list) -> float:
     """
     Computa un 'FactScore' promedio basado en la similitud NLI.
     
@@ -305,89 +330,68 @@ def compute_factscore(nli_pipeline, generated_text: str, evidence_texts: list) -
         float: un puntaje (0 a 1) de qué tan consistente es 'generated_text'
                con la evidencia.
     """
-    # 1. Divide el texto generado en oraciones (muy simplificado aquí).
-    #    Podrías usar nltk.sent_tokenize o spacy para algo más robusto.
-    sentences = generated_text.split(".")
-    sentences = [s.strip() for s in sentences if s.strip()]
 
-    # 2. Para cada oración, mediremos la "fuerza" de entailment
-    scores = []
+    evidence_text = "\n".join(ev for ev in evidence_texts)
 
-    for sent in sentences:
-        # Evitar strings vacíos
-        if not sent:
-            continue
+    to_classify = f"premise: {evidence_text}\nhypothesis: {generated_text}"
+    
+    result = nli_pipeline(to_classify, top_k=None, truncation=True)
 
-        # 3. Ver qué tan "respaldada" está la oración en todas las evidencias
-        #    (Por simplicidad, tomamos la evidencia que mayor prob. de entailment dé)
-        max_entail_score = 0.0
+    if(consensus==0):
+        for d in result:
+            if d['label'] == 'entailment':
+                fact_score = d['score']
+    elif(consensus==1):
+        for d in result:
+            if d['label'] == 'contradiction':
+                fact_score = d['score']
+    else:
+        for d in result:
+            if d['label'] == 'neutral':
+                fact_score = d['score']
 
-        for ev in evidence_texts:
-            # Estructura tipo "premise (evidence) => hypothesis (sent)"
-            # Crearemos un input para el pipeline
-            to_classify = f"premise: {ev}\nhypothesis: {sent}"
-            
-            # El pipeline "text-classification" con 'bart-large-mnli' típicamente
-            # espera el texto directamente; la parte "premise/hypothesis" es conceptual.
-            # Ej: bart-large-mnli a veces funciona con:
-            # to_classify = [ev, sent], pero probemos con un input unificado:
-            result = nli_pipeline(to_classify, top_k=None, truncation=True)
-            # 'result' es una lista de dicts con 'label' y 'score'
-            # Ej: [{'label': 'CONTRADICTION', 'score': 0.1}, 
-            #       {'label': 'ENTAILMENT', 'score': 0.8}, 
-            #       {'label': 'NEUTRAL', 'score': 0.1}]
-            
-            if isinstance(result, list) and len(result) > 0:
-                # Ubicar la prob. de entailment
-                entail_score = 0.0
-                for d in result:  # dependemos de la estructura devuelta
-                    if d['label'] == 'entailment':
-                        entail_score = d['score']
-                        break
-
-                # Nos quedamos con la mayor que encontremos en cualquier evidence_text
-                if entail_score > max_entail_score:
-                    max_entail_score = entail_score
-            
-        # Guardamos la puntuación de esta oración
-        scores.append(max_entail_score)
-
-    if not scores:
-        return 0.0
-
-    # 4. Tomar la media de las probabilidades de entailment
-    fact_score = sum(scores) / len(scores)
     return fact_score
+
+
+def evaluate_time_response():
+    """
+    Este método evalúa el tiempo de respuesta del pipeline de verificación para cada consulta
+    y calcula la media al finalizar.
+    """
+    user_queries = pd.read_csv(f"./evaluation/evaluation-bert-v{TIME_EVALUATION_VERSION}.csv")
+    total_time = 0
+    response_times = []  # Lista para almacenar tiempos individuales
+
+    for i, row in tqdm.tqdm(user_queries.iterrows(), desc="Proceso Evaluación: ", total=user_queries.shape[0]):
+        start_time = time.perf_counter()  # Usa perf_counter para mayor precisión
+        response = verification_pipeline(row["claim"])  # Llama al pipeline de verificación
+        end_time = time.perf_counter()  # Finaliza la medición del tiempo
+        
+        response_time = end_time - start_time  # Calcula el tiempo de respuesta
+        response_times.append(response_time)  # Almacena el tiempo individual
+        total_time += response_time  # Suma al tiempo total
+
+        print(f"Consulta {i}: Tiempo de respuesta = {response_time:.4f} segundos")
+
+    # Calcula la media de tiempo de respuesta
+    mean_time = total_time / len(response_times) if response_times else 0
+    print(f"Tiempo medio de respuesta: {mean_time:.4f} segundos")
+
+""" RESULTS: Tiempo medio de respuesta:  segundos"""
 
 if __name__ == "__main__":
 
-    # Evaluar Salida Final
-    # evaluate_verification_pipeline()
+    # Evaluar Salida Final (Precision, Recall, F1 de Verdadero / Falso / Other)
+    evaluate_verification_pipeline()
 
-    # Evaluar retriever
-    # evaluate_retriever(k=5)
+    # Evaluar Retriever (Recall@k y MRR al hace retrieval de evidencias)
+    evaluate_retriever(k=5)
 
-    # Evaluar BERT Score
-    # evaluate_bert_score()
+    # Evaluar BERT Score (Similaridad respuesta del LLM y evidencias)
+    evaluate_bert_score()
 
     # Evaluar Fact Score
     evaluate_factscore()
 
-
-""" RESULTS """
-
-""" Prueba 8 - Dataset v0
-
-"""
-
-""" Prueba 6 - Dataset v0
-              precision    recall  f1-score   support
-
-       other       0.96      0.90      0.93        30
-      refute       0.80      0.89      0.84         9
-     support       0.91      1.00      0.95        10
-
-    accuracy                           0.92        49
-   macro avg       0.89      0.93      0.91        49
-weighted avg       0.92      0.92      0.92        49
-"""
+    # Evaluar Tiempo de Respuesta (Media de 30 consultas)
+    evaluate_time_response()

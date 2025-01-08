@@ -12,7 +12,7 @@ import json
 logger = getLogger('server-side')
 logger = configure_logger(logger)
 
-# regrex pattern
+# Regrex pattern
 source_filter = re.compile(r"\[\s*\d+\s*\]\s(.*)")
 citations_filter = re.compile(r"\[(\d+)\]")
 
@@ -33,17 +33,19 @@ def normalize_citations(response) -> tuple[str, dict[int, int]]:
 
     current_citation = 0
     for atomic in response['atomics']:
-        # get citations ids
+        # Get citations ids
         #if atomic['consensus'] != "no evidence":
-        support = atomic['consensus'].replace(" ", "-")
-        if support == "support":
+        inconclusive = False
+        support_state = atomic['consensus'].replace(" ", "-")
+        if support_state == "support":
             support = '<span class="material-symbols-outlined" data-icon="check"></span>'
-        elif support == "refute":    
+        elif support_state == "refute":    
             support = '<span class="material-symbols-outlined" data-icon="close"></span>'
         else: 
             support = '<span class="material-symbols-outlined" data-icon="warning"></span>'
+            inconclusive = True
 
-        # get citations
+        # Get citations
         citations = citations_filter.findall(atomic['response'])
         citation_ids = [int(cite) - 1 for cite in citations]
         
@@ -60,9 +62,15 @@ def normalize_citations(response) -> tuple[str, dict[int, int]]:
 
             source_map[cite] = seen_sources[source][0]
 
-        # get sources
+        # Get sources
         atomic['response'] = re.sub(r"\[(\d+)\]", replace_match, atomic['response'])
-        atomic_bullets += f"""<li><span class="fw-bold">{support}{atomic['atomic']}</span><p>{atomic['response']}</p></li>\n"""
+        score_display   = f'<span class="score-display"> [ {round(atomic['score'] * 100, 1)} % ]</span>' if len(sources) > 0 and not inconclusive else ""
+        
+        atomic_bullets += f"""
+            <li>
+                <span class="fw-bold">{support}{score_display}{atomic['atomic']}</span>
+                <p>{atomic['response']}
+                </p></li>\n"""
 
     return atomic_bullets, seen_sources
 
@@ -101,7 +109,8 @@ def send_message():
 
         html_output = f"""
             <div class="ms-1 d-flex flex-column">
-                <p>
+                <p style="display: flex">
+                    <span class="material-symbols-outlined" data-icon="smart_toy" > </span>
                     <strong>AI:  {response['general']} </strong>
                 </p>
                 <div class="ms-4">
@@ -110,14 +119,17 @@ def send_message():
                     </ul>
                     {source_details}
                 </div>
+            </div>
             """
         
         if not response['verified']:
             html_output = f"""
             <div class="ms-1">
-                <p>
-                    <strong>AI: </strong> {response['general']}
+                <p style="display: flex">
+                    <span class="material-symbols-outlined" data-icon="smart_toy" > </span>
+                    <strong>AI:  {response['general']} </strong>
                 </p>
+            </div>
             """
 
         return jsonify({"result": html_output})

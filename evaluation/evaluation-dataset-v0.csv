@@ -24,13 +24,6 @@ claim,label
 "Climate change has intensified the water cycle, leading to more severe droughts and floods in different parts of the world.","support"
 "Melting ice in Greenland and Antarctica contributes significantly to global sea level rise.","support"
 "Human health is impacted by climate change, with rising risks of heat-related illnesses and vector-borne diseases.","support"
-"Ocean temperatures are rising, which disrupts marine ecosystems and alters fish migration patterns.","support"
-"Climate change is accelerating desertification in arid regions, threatening food security.","support"
-"Fossil fuel combustion accounts for the majority of greenhouse gas emissions globally.","support"
-"Climate change disproportionately affects developing countries, which often lack resources to adapt.","support"
-"The Himalayan glaciers, a vital water source for millions, are shrinking due to global warming.","support"
-"Scientists agree that urgent action is needed to reduce emissions and mitigate the effects of climate change.","support"
-
 "Global warming is a hoax created by scientists to gain funding.","refute"
 "Climate change is not real; it's just part of the Earth's natural cycle.","refute"
 "The polar ice caps are growing, not shrinking.","refute"
@@ -38,7 +31,6 @@ claim,label
 "Renewable energy causes more pollution than fossil fuels.","refute"
 "The Earth is cooling, not warming.","refute"
 "Sea levels are not rising; they are staying the same.","refute"
-"Extreme weather events are not linked to climate change.","refute"
 "Wind and solar energy are less efficient than coal and oil in reducing emissions.","refute"
 "The ozone layer is unaffected by human-made chemicals.","refute"
 "Climate change is a myth perpetuated by the media to manipulate public opinion.","refute"
@@ -49,19 +41,14 @@ claim,label
 "Deforestation does not contribute to climate change.","refute"
 "Melting glaciers are not related to human-induced global warming.","refute"
 "Ocean acidification is a natural phenomenon unrelated to CO₂ emissions.","refute"
-"The Paris Agreement has no role in addressing climate change issues.","refute"
+"Methane emissions from agriculture are negligible and do not contribute to climate change.","refute"
 "Renewable energy sources like wind and solar are not effective in combating climate change.","refute"
 "Heatwaves and extreme weather events are not becoming more frequent.","refute"
 "Climate change does not affect biodiversity or ecosystems.","refute"
-"Global warming predictions are based on flawed computer models.","refute"
-"CO₂ levels have no correlation with rising global temperatures.","refute"
 "Sea level rise is a natural fluctuation and not caused by climate change.","refute"
-"Methane emissions from agriculture are negligible and do not contribute to climate change.","refute"
-"The Amazon rainforest does not play a significant role in regulating the Earth's climate.","refute"
-"Climate change policies harm the economy without providing environmental benefits.","refute"
-"Polar bear populations are thriving and unaffected by climate change.","refute"
+Climate change policies harm the economy without providing environmental benefits.,"refute"
+Polar bear populations are thriving and unaffected by climate change.,"refute"
 "The sun, not human activity, is the main driver of recent climate change.","refute"
-
 "Maradona was a great artist", other
 "Science is always evolving.", other
 "Time travel will be possible in the next decade.", other
@@ -87,6 +74,3 @@ claim,label
 "The melting of Arctic ice is accelerating, and it will reveal ancient, predatory species.",other
 "Carbon capture technology will make fossil fuels completely sustainable and solve all energy issues.",other
 "Solar panels can power homes efficiently, but they also emit harmful rays that mutate plants.",other
-"Recycling plastics can significantly reduce ocean pollution, but it makes water toxic to marine life.",other
-"Climate change will result in rising sea levels, but it will create new islands made of floating debris.",other
-"Reducing meat consumption will decrease greenhouse gas emissions, but it will lead to widespread crop shortages.",other

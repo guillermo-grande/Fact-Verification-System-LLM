@@ -35,7 +35,8 @@
 
                     <!-- Chat Messages -->
                     <div id="chat-box" class="card-body overflow-auto" style="background-color: #ffffff; color: #333; margin-top: 10px; padding: 10px 50px; width: 100%">
-                        <div class="mb-4">
+                        <div class="" style="display: flex;">
+                            <span class="material-symbols-outlined" data-icon="smart_toy" ></span>
                             <strong>AI:</strong> Hi there! I'm here to help you with your doubts about climate change.                              
                         </div>
                     </div>
@@ -94,7 +95,6 @@
             chatBox.appendChild(userMessage);
             messageInput.disabled = true;
 
-            // Scroll to the bottom of the chat box
             chatBox.scrollTop = chatBox.scrollHeight;
 
             // Clear the input field
@@ -115,7 +115,6 @@
                     serverMessage.innerHTML = `${data.result}`;
                     chatBox.appendChild(serverMessage);
 
-                    // Scroll to the bottom of the chat box
                     chatBox.scrollTop = chatBox.scrollHeight;
                 })
                 .catch(error => {
@@ -124,7 +123,6 @@
                     
                     chatBox.appendChild(serverMessage);
 
-                    // Scroll to the bottom of the chat box
                     chatBox.scrollTop = chatBox.scrollHeight;
                     
                     console.error('Error:', error);

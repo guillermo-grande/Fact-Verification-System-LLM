@@ -25,7 +25,7 @@ from fact_checker.decomposer   import decompose_query
 from collections import defaultdict
 from llama_index.core.schema import NodeWithScore
 from llama_index.core.prompts import PromptTemplate
-from llama_index.core.query_engine import CitationQueryEngine
+from llama_index.core.base.response.schema import Response
 from llama_index.core.response_synthesizers import BaseSynthesizer, ResponseMode, get_response_synthesizer
 
 
@@ -33,14 +33,6 @@ import re
 
 from transformers import pipeline
 from langdetect import detect
-
-#----------------------------------------------------------------------------------------
-# Translator
-#----------------------------------------------------------------------------------------
-
-# # Use a pipeline as a high-level helper
-# pipe = pipeline("translation", model="Helsinki-NLP/opus-mt-en-mul")
-# logger.debug("loaded translation model: Helsinki-NLP/opus-mt-en-mul")
 
 #--------------------------------------------------------------------
 # Data Retriever
@@ -63,9 +55,10 @@ TRANSLATION: str = load_prompt("translation", TRANSLATION_VERSION)
 PROMPT_TRANSLATION = PromptTemplate(TRANSLATION)
 
 #--------------------------------------------------------------------
-# Translation Models
+# Scoring Models
 #--------------------------------------------------------------------
-# def load_translation_model()
+model_name = "facebook/bart-large-mnli"
+nli_pipeline = pipeline("text-classification", model = model_name)
 
 #--------------------------------------------------------------------
 # Translation
@@ -146,6 +139,40 @@ def consolidate_results(results: list[EvidenceEnum], atomics: str, user_query: s
             consolidation_response_eval = EvidenceEnum.NO_ENOUGH_EVIDENCE
         return consolidation_response_eval, consolidation_response
 
+#--------------------------------------------------------------------
+# Score
+#--------------------------------------------------------------------
+def score_atomic(atomic: str, response: Response, consensus: EvidenceEnum) -> float:
+    """Creates a relevance / confidence score for an atomic response. 
+    
+    Args:
+        - atomic (str): original query
+        - response (Response): responde of RAG
+    """
+
+    evidence_text = "\n".join(ev.get_text().split("]", 2)[1] for ev in response.source_nodes)
+    to_classify = f"premise: {evidence_text}\nhypothesis: {atomic}"
+    result = nli_pipeline(to_classify, top_k=None, truncation=True)
+    if(consensus == EvidenceEnum.SUPPORTS):
+        fact_score = 0
+        for d in result:
+            if d['label'] == 'entailment':
+                fact_score += d['score']
+            if d['label'] == 'neutral':
+                fact_score += d['score']**2
+    elif(consensus==EvidenceEnum.REFUTES):
+        fact_score = 0
+        for d in result:
+            if d['label'] == 'contradiction':
+                fact_score += d['score']
+            if d['label'] == 'neutral':
+                fact_score += d['score']**2
+    else:
+        for d in result:
+            if d['label'] == 'neutral':
+                fact_score = d['score']
+    return fact_score
+
 
 #--------------------------------------------------------------------
 # Verification Pipeline
@@ -170,8 +197,10 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
     all_results = []
     consolidation_atomics = ""
 
-    decision, _ = consensus = verification_consensus(user_query)
-    all_consensus.append([user_query, *consensus])
+    decision, response = verification_consensus(user_query)
+    atomic_score = score_atomic(user_query, response, decision)
+    
+    all_consensus.append([user_query, decision, response, atomic_score])
     all_results.append(decision)
 
     evidence_found = decision == EvidenceEnum.SUPPORTS or decision == EvidenceEnum.REFUTES  
@@ -186,9 +215,12 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
         # decompose into multiple atomic claims
         atomic_claims = decompose_query(user_query)
         for claim_id, atomic in enumerate(atomic_claims):
-            decision, _ = consensus = verification_consensus(atomic)
-            all_consensus.append([atomic, *consensus])
+            decision, response = verification_consensus(atomic)
+
+            atomic_score = score_atomic(atomic, response, decision)
+            all_consensus.append([atomic, decision, response, atomic_score])
             all_results.append(decision)
+
             evidence_found = evidence_found or decision != EvidenceEnum.NO_EVIDENCE
             # print(f"{claim_id:>2d} - validation: {str(decision)} - atomic: {atomic}")
 
@@ -224,7 +256,7 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
         all_consensus[atomic_id][2].response = translated_parts[2 * atomic_id]
 
     ret =  {
-        'claim': user_query,
+        'claim': user_query.capitalize(),
         'verified': verified,
         'result': str(consolidatidated),
         'see-sources': see_sources,
@@ -232,9 +264,10 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
         'general' : consolidation_response,
         'atomics' : [
             {
-                'atomic'   : consensus[0], 
+                'atomic'   : consensus[0].capitalize(), 
+                'score'    : consensus[3],
                 'consensus': str(consensus[1]) , # support / refute / no evidence / no enough evidence 
-                'response' : str(consensus[2]) ,
+                'response' : str(consensus[2]).capitalize() ,
                 'sources'  : [
                     {
                         'article': source.node.metadata.get("article") ,
