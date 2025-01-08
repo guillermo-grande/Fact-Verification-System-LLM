@@ -46,7 +46,7 @@ from langdetect import detect
 #--------------------------------------------------------------------
 # Data Retriever
 #--------------------------------------------------------------------
-retrieve_engine = EvidenceClaimRetriever(3, 25)
+retrieve_engine = EvidenceClaimRetriever(3, 5)
 
 #--------------------------------------------------------------------
 # Prompts Static Loading
