@@ -41,12 +41,11 @@ from langdetect import detect
 # # Use a pipeline as a high-level helper
 # pipe = pipeline("translation", model="Helsinki-NLP/opus-mt-en-mul")
 # logger.debug("loaded translation model: Helsinki-NLP/opus-mt-en-mul")
-    
 
 #--------------------------------------------------------------------
 # Data Retriever
 #--------------------------------------------------------------------
-retrieve_engine = EvidenceClaimRetriever(3, 5)
+retrieve_engine = EvidenceClaimRetriever(3, 7)
 
 #--------------------------------------------------------------------
 # Prompts Static Loading
@@ -81,7 +80,7 @@ def translate_text(text: str, src_lang: str, dst_lang: str) -> str:
 #--------------------------------------------------------------------
 # Verification Model
 #--------------------------------------------------------------------
-conclusion_filter  = re.compile('CONCLUSION: "([\w\s\d]*)"\s*EXPLANATION:\s+((.|\n)*)')
+conclusion_filter  = re.compile(r'CONCLUSION: "([\w\s\d]*)"\s*EXPLANATION:\s+((.|\n)*)')
 def verification_consensus(claim: str) -> tuple[EvidenceEnum, str]:
     """Calls an LLM model to determine the veracity of an atomic claim based on a list of evidence
     notes. The model uses determine if the evidence supports or refutes the claim or if there is not
@@ -167,7 +166,6 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
 
     # get claims
     all_consensus = []
-    evidence_found = False
 
     all_results = []
     consolidation_atomics = ""
@@ -175,8 +173,9 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
     decision, _ = consensus = verification_consensus(user_query)
     all_consensus.append([user_query, *consensus])
     all_results.append(decision)
-    evidence_found = evidence_found or decision != EvidenceEnum.NO_EVIDENCE
 
+    evidence_found = decision == EvidenceEnum.SUPPORTS or decision == EvidenceEnum.REFUTES  
+    
     consensus_atomic = f"atomic: {user_query}\nvalidation: {str(decision)}"
     consolidation_atomics += consensus_atomic + "\n"
 

@@ -253,7 +253,7 @@ def create_vector_index(collection_name: str, data: pd.DataFrame) -> VectorStore
 #----------------------------------------------------------------------------------------
 
 class EvidenceClaimRetriever(BaseRetriever):
-    CLAIM_THRESS: float = 0.4
+    CLAIM_THRESS   : float = 0.4
     EVIDENCE_THRESS: float = 0.4
 
     def __init__(self, claim_top: int = 3, evidence_top: int = 5):

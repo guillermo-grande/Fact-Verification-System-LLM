@@ -119,6 +119,14 @@
                     chatBox.scrollTop = chatBox.scrollHeight;
                 })
                 .catch(error => {
+                    const serverMessage = document.createElement('div');
+                    serverMessage.innerHTML = `<span class="text-danger">There was an error in server.</span><p class="text-danger">${error}</p>`;
+                    
+                    chatBox.appendChild(serverMessage);
+
+                    // Scroll to the bottom of the chat box
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                    
                     console.error('Error:', error);
                 });
         }

@@ -22,7 +22,7 @@ route_blueprint = Blueprint("routes", __name__, template_folder='templates')
 @route_blueprint.route('/')
 def index():
     return render_template('index.html')
-
+ 
 # Route to handle messages (POST request)
 def normalize_citations(response) -> tuple[str, dict[int, int]]:
     atomic_bullets = ""
