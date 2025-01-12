@@ -64,7 +64,9 @@ def normalize_citations(response) -> tuple[str, dict[int, int]]:
 
         # Get sources
         atomic['response'] = re.sub(r"\[(\d+)\]", replace_match, atomic['response'])
-        score_display   = f'<span class="score-display"> [ {round(atomic['score'] * 100, 1)} % ]</span>' if len(sources) > 0 and not inconclusive else ""
+
+        confidence_percent = round(atomic['score']  * 100, 1)
+        score_display   = f'<span class="score-display"> [ {confidence_percent} % ]</span>' if len(sources) > 0 and not inconclusive else ""
         
         atomic_bullets += f"""
             <li>
