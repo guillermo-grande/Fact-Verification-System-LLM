@@ -4,9 +4,11 @@ and Retrieval-Augmented Generation (RAG) frameworks. The system validates factua
 by combining advanced semantic understanding with dynamic, context-aware retrival of 
 trusted information. 
 
-## How to Run ✅
 1. Install all dependencies
-2. ```bash python main.py
+2. Run the following command:
+
+   ```bash
+   python main.py
 
 ## Contributors
 The implemented system in this repository was developed by:
