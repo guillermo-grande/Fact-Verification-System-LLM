@@ -16,6 +16,9 @@ logger = logging.getLogger("fact-checker.llm-selector")
 # URL del endpoint para el modelo Llama 3.2
 LLAMA_API_URL = "http://kumo01:11434/api/generate"
 
+# llm temperature.
+TEMPERATURE: float = 0.0
+
 def test_llama() -> bool:
     # ping llama instance
     try: found = ping("http://kumo01:11434")
@@ -35,6 +38,6 @@ if not LLAMA_AVAILABLE:
         logger.critical("La API key de OpenAI no se encontró en el archivo .env.")
         raise ValueError("Falta la API key de OpenAI en el archivo .env.")
 
-    llm = OpenAI(model = "gpt-4o-mini", temperature=0.1, max_tokens=None)
+    llm = OpenAI(model = "gpt-4o-mini", temperature=TEMPERATURE, max_tokens=None)
 else:
-    llm = Ollama("llama2:latest", "http://kumo01:11434", temperature=0.1, request_timeout=120.0)
+    llm = Ollama("llama2:latest", "http://kumo01:11434", temperature=TEMPERATURE, request_timeout=120.0)

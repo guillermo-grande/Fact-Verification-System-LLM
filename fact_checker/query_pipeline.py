@@ -197,16 +197,18 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
     all_results = []
     consolidation_atomics = ""
 
+    user_query = translate_text(user_query, input_language, 'en')
     decision, response = verification_consensus(user_query)
     atomic_score = score_atomic(user_query, response, decision)
-    
-    all_consensus.append([user_query, decision, response, atomic_score])
-    all_results.append(decision)
 
-    evidence_found = decision == EvidenceEnum.SUPPORTS or decision == EvidenceEnum.REFUTES  
-    
+    evidence_found = False # (decision == EvidenceEnum.SUPPORTS or decision == EvidenceEnum.REFUTES) and atomic_score > 0.95
+    print(f"base user result: \"{decision}\" with confidence: {atomic_score * 100:5.3} -> evidence: {evidence_found}")
+
     consensus_atomic = f"atomic: {user_query}\nvalidation: {str(decision)}"
     consolidation_atomics += consensus_atomic + "\n"
+
+    all_consensus.append([user_query, decision, response, atomic_score])
+    all_results.append(decision)
 
     if(not evidence_found):
         all_consensus = []

@@ -10,7 +10,7 @@ from flask_app.routes import route_blueprint
 def main():
     app.register_blueprint(route_blueprint)
     app.run(debug=False)
-
+    
 
 # Create the Flask app
 app = Flask(__name__, template_folder="flask_app/templates", static_folder='flask_app/static')
