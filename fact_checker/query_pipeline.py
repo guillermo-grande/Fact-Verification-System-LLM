@@ -64,10 +64,12 @@ nli_pipeline = pipeline("text-classification", model = model_name)
 # Translation
 #--------------------------------------------------------------------
 def translate_text(text: str, src_lang: str, dst_lang: str) -> str:
+    #print(f"Translating from {src_lang} to {dst_lang}")
     if src_lang == dst_lang: return text
     
     translation_prompt = PROMPT_TRANSLATION.format(text=text, src_lang=src_lang, dst_lang=dst_lang)
     translation_response = llm.complete(translation_prompt).text
+    #print(translation_response)
     return translation_response
 
 #--------------------------------------------------------------------
@@ -153,6 +155,7 @@ def score_atomic(atomic: str, response: Response, consensus: EvidenceEnum) -> fl
     evidence_text = "\n".join(ev.get_text().split("]", 2)[1] for ev in response.source_nodes)
     to_classify = f"premise: {evidence_text}\nhypothesis: {atomic}"
     result = nli_pipeline(to_classify, top_k=None, truncation=True)
+    print(result)
     if(consensus == EvidenceEnum.SUPPORTS):
         fact_score = 0
         for d in result:
@@ -201,7 +204,7 @@ def verification_pipeline(user_query: str) -> dict[str, any]:
     decision, response = verification_consensus(user_query)
     atomic_score = score_atomic(user_query, response, decision)
 
-    evidence_found = (decision == EvidenceEnum.SUPPORTS or decision == EvidenceEnum.REFUTES) and atomic_score > 0.95
+    evidence_found = (decision == EvidenceEnum.SUPPORTS or decision == EvidenceEnum.REFUTES) and atomic_score > 0.65
     print(f"base user result: \"{decision}\" with confidence: {atomic_score * 100:5.3} -> evidence: {evidence_found}")
 
     consensus_atomic = f"atomic: {user_query}\nvalidation: {str(decision)}"
